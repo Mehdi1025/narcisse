@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Tokens de marque (brand book « Nuit égéenne ») ───────────────────────── */
+@theme inline {
+  --color-encre: #111a2b;
+  --color-encre-2: #0b111c;
+  --color-ivoire: #eee8dc;
+  --color-bordeaux: #96433a;
+  --color-papier: #f6f2ea;
+  --color-egeen: #4f6788;
+  --color-sauge: #7e8f80;
+  --color-rose: #d9b8ae;
+  --color-gris: #3b4252;
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-jost), "Jost", system-ui, sans-serif;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 88px;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+body {
+  margin: 0;
+  background: var(--color-papier);
+  color: var(--color-gris);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.65;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--color-bordeaux);
+  color: var(--color-papier);
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 4px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.015em;
+}
+p {
+  margin: 0;
+}
+
+/* ───────────────────────── Typographie éditoriale ───────────────────────── */
+.eyebrow {
+  font: 500 12px/1.4 var(--font-sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+}
+.serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+}
+.split-line {
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* ───────────────────────── Arches ───────────────────────── */
+.arch {
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+.arch-soft {
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  overflow: hidden;
+}
+
+/* ───────────────────────── Liens et boutons ───────────────────────── */
+.link-line {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.7s var(--ease-expo);
+  text-decoration: none;
+}
+.link-line:hover,
+.link-line:focus-visible {
+  background-size: 100% 1px;
+}
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 54px;
+  padding: 0 30px;
+  border-radius: 999px;
+  font: 500 12.5px var(--font-sans);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.6s var(--ease-expo), border-color 0.6s;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  transform: translateY(102%);
+  transition: transform 0.7s var(--ease-expo);
+}
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: none;
+}
+.btn-fill {
+  background: var(--color-bordeaux);
+  color: var(--color-papier);
+}
+.btn-fill::before {
+  background: var(--color-encre);
+}
+.btn-line {
+  border: 1px solid currentColor;
+}
+.btn-line::before {
+  background: currentColor;
+}
+.btn-line.on-dark:hover,
+.btn-line.on-dark:focus-visible {
+  color: var(--color-encre);
+}
+.btn-line.on-light:hover,
+.btn-line.on-light:focus-visible {
+  color: var(--color-papier);
+}
+.btn .btn-label {
+  position: relative;
+  display: inline-block;
+}
+
+/* ───────────────────────── Curseur ───────────────────────── */
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  transition: width 0.6s var(--ease-expo), height 0.6s var(--ease-expo), margin 0.6s var(--ease-expo), opacity 0.4s;
+}
+.cursor span {
+  font: 500 10px var(--font-sans);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+}
+.cursor.is-on {
+  opacity: 1;
+}
+.cursor.is-link {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+}
+.cursor.is-label {
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+}
+.cursor.is-label span {
+  opacity: 1;
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor {
+    display: none;
+  }
+}
+
+/* ───────────────────────── Bandeau défilant ───────────────────────── */
+.marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+/* ───────────────────────── États initiaux (uniquement si JS + animations autorisées) ───────────────────────── */
+html.js-motion .hero-intro [data-hero-fade] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

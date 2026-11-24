@@ -1,0 +1,109 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 2.2vw, 36px);
+}
+.card {
+  position: relative;
+  outline: none;
+}
+.card:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 8px;
+}
+.img {
+  position: absolute;
+  inset: 0;
+  transition: transform 1.4s var(--ease-expo);
+}
+.card:hover .img,
+.card:focus-visible .img {
+  transform: scale(1.06);
+}
+.img :global([data-lift]) {
+  transition: transform 1s var(--ease-expo);
+  transform-box: fill-box;
+}
+.card:hover .img :global([data-lift]),
+.card:focus-visible .img :global([data-lift]) {
+  transform: translateY(-10px);
+}
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.ring path {
+  fill: none;
+  stroke: rgba(238, 232, 220, 0.85);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.2s var(--ease-expo);
+}
+.card:hover .ring path,
+.card:focus-visible .ring path {
+  stroke-dashoffset: 0;
+}
+.tag {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 7px 12px 6px;
+  border-radius: 999px;
+  background: rgba(17, 26, 43, 0.72);
+  backdrop-filter: blur(6px);
+  color: var(--color-ivoire);
+  font-size: 10.5px;
+  transform: translateY(6px);
+  opacity: 0.85;
+  transition: transform 0.8s var(--ease-expo), opacity 0.8s;
+}
+.card:hover .tag {
+  transform: none;
+  opacity: 1;
+}
+.bar {
+  display: block;
+  height: 1px;
+  margin-top: 18px;
+  background: var(--color-rose);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease-expo);
+}
+.card:hover .bar,
+.card:focus-visible .bar {
+  transform: scaleX(1);
+}
+.outlineText {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(238, 232, 220, 0.55);
+}
+
+/* Tablette : 2 colonnes ; mobile : carrousel horizontal aimanté */
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 639px) {
+  .grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+  }
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+  .card {
+    flex: 0 0 78vw;
+    scroll-snap-align: start;
+  }
+}
