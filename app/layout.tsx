@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import SmoothScroll from "@/components/providers/SmoothScroll";
-import Cursor from "@/components/ui/Cursor";
+import SiteChrome from "@/components/providers/SiteChrome";
 import "./globals.css";
 
 // Polices auto-hébergées (licence SIL OFL) : aucun appel externe au chargement.
@@ -57,13 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: motionScript }} suppressHydrationWarning />
       </head>
       <body>
-        <a href="#philosophie" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-ivoire focus:px-5 focus:py-3 focus:text-encre">
-          Aller au contenu
-        </a>
-        <SmoothScroll>
-          {children}
-          <Cursor />
-        </SmoothScroll>
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

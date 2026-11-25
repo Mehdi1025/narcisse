@@ -1,0 +1,258 @@
+/* Espaces de gestion — interface dense, lisible, aux couleurs de la marque. */
+/* Base de l'interface (hors couche, pour primer sur le body du site). */
+.app-body {
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--color-papier);
+  color: var(--color-encre);
+  min-height: 100dvh;
+}
+
+/* Liens du dock : hors couche pour primer sur « a { color: inherit } » du site. */
+.nx-glass .nx-dock-link { color: var(--color-encre); }
+.nx-glass .nx-dock-link[aria-current="page"] { color: #111a2b; }
+/* Chiffres alignés (Cormorant a des chiffres elzéviriens par défaut). */
+.app-body .font-serif { font-variant-numeric: lining-nums tabular-nums; }
+
+/* Les règles d'éléments du site (p, h1–h3) ne doivent pas écraser les utilitaires Tailwind ici. */
+.app-body p,
+.app-body :where(h1, h2, h3) {
+  margin: revert-layer;
+  font-family: revert-layer;
+  letter-spacing: revert-layer;
+  font-weight: revert-layer;
+}
+
+/* Dans la couche « components » : les utilitaires Tailwind restent prioritaires. */
+@layer components {
+.app-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.app-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-encre) 18%, transparent);
+  border-radius: 8px;
+}
+.app-card {
+  background: #fffdf9;
+  border: 1px solid color-mix(in oklab, var(--color-encre) 9%, transparent);
+  border-radius: 18px;
+}
+.app-label {
+  font: 500 11px/1.3 var(--font-sans);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--color-encre) 55%, transparent);
+}
+.app-input {
+  width: 100%;
+  border: 1px solid color-mix(in oklab, var(--color-encre) 16%, transparent);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--color-encre);
+}
+.app-input:focus {
+  outline: 2px solid color-mix(in oklab, var(--color-egeen) 55%, transparent);
+  outline-offset: 1px;
+}
+.app-fade {
+  animation: app-fade 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.app-rise {
+  animation: app-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.app-toast {
+  animation: app-rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.app-drawer {
+  animation: app-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes app-fade {
+  from { opacity: 0; }
+}
+@keyframes app-rise {
+  from { opacity: 0; transform: translateY(10px); }
+}
+@keyframes app-slide {
+  from { transform: translateX(100%); }
+}
+.app-stripes {
+  background-image: repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-encre) 7%, transparent) 0 6px, transparent 6px 12px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-fade, .app-rise, .app-toast, .app-drawer { animation: none; }
+}
+}
+
+/* ═════════════════════ Espace administratrice — « verre égéen » ═════════════════════
+   Inspiré d'un tableau de bord spatial en verre, adapté à la charte : palette Nuit égéenne,
+   Cormorant pour les titres, Jost pour l'interface, logo en SVG. Deux ambiances : aube / nuit. */
+.nx-glass {
+  --nx-rim: rgb(255 253 248 / 55%);
+  --nx-edge-light: rgb(255 254 250 / 85%);
+  --nx-edge-shade: rgb(17 26 43 / 14%);
+  --nx-gloss: rgb(255 252 246 / 48%);
+  --nx-frame: rgb(246 242 234 / 30%);
+  --nx-rail: rgb(246 242 234 / 52%);
+  --nx-card: rgb(250 246 239 / 52%);
+  --nx-card-light: rgb(255 253 249 / 40%);
+  --nx-raised: rgb(255 252 247 / 82%);
+  --nx-inner: rgb(255 252 247 / 40%);
+  --nx-surface: #f6f2ea;
+  --nx-line: rgb(17 26 43 / 11%);
+  --nx-track: rgb(17 26 43 / 9%);
+  --nx-shadow: 22 28 44;
+  --nx-pick: #fffcf6;
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  color: var(--color-encre);
+  color-scheme: light;
+  font-variant-numeric: tabular-nums;
+}
+.nx-glass[data-theme="dark"] {
+  --color-encre: #f3eee4;
+  --color-encre-2: #eee8dc;
+  --color-ivoire: #111a2b;
+  --color-papier: #17213a;
+  --color-gris: #c9cfdb;
+  --color-bordeaux: #e8a08e;
+  --color-egeen: #a9bedb;
+  --color-sauge: #a8bba9;
+  --color-rose: #d9b8ae;
+  --color-voile: #2a3757;
+  --color-sauge-fonce: #c3d6c4;
+  --nx-rim: rgb(238 232 220 / 20%);
+  --nx-edge-light: rgb(238 232 220 / 36%);
+  --nx-edge-shade: rgb(3 6 14 / 40%);
+  --nx-gloss: rgb(238 232 220 / 9%);
+  --nx-frame: rgb(15 23 40 / 50%);
+  --nx-rail: rgb(17 26 43 / 58%);
+  --nx-card: rgb(26 37 60 / 56%);
+  --nx-card-light: rgb(79 103 136 / 20%);
+  --nx-raised: rgb(46 60 88 / 84%);
+  --nx-inner: rgb(42 55 82 / 46%);
+  --nx-surface: #17213a;
+  --nx-line: rgb(238 232 220 / 13%);
+  --nx-track: rgb(238 232 220 / 12%);
+  --nx-shadow: 2 5 12;
+  --nx-pick: #eee8dc;
+  color-scheme: dark;
+}
+
+@layer components {
+  /* Décor */
+  .nx-backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .nx-backdrop img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Surfaces en verre */
+  .nx-rail {
+    border: 1px solid var(--nx-rim);
+    background: linear-gradient(165deg, var(--nx-gloss), transparent 32% 73%, var(--nx-gloss)), var(--nx-rail);
+    box-shadow: inset 1px 1px 1px var(--nx-edge-light), inset -1px -1px 1px var(--nx-edge-shade),
+      inset 0 -2px 5px var(--nx-gloss), 0 7px 20px rgb(var(--nx-shadow) / 16%);
+    backdrop-filter: blur(16px) saturate(1.35);
+    -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  }
+  .nx-stage {
+    border: 1px solid var(--nx-rim);
+    border-radius: 34px;
+    background: linear-gradient(148deg, var(--nx-gloss), transparent 19% 77%, color-mix(in srgb, var(--nx-gloss) 48%, transparent)), var(--nx-frame);
+    box-shadow: inset 1px 1px 1px var(--nx-edge-light), inset -1px -1px 1px var(--nx-edge-shade), inset 0 0 7px var(--nx-gloss),
+      0 1px 3px rgb(var(--nx-shadow) / 16%), 0 22px 72px rgb(var(--nx-shadow) / 24%);
+    backdrop-filter: blur(14px) saturate(1.25);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  }
+  .nx-stage-scroll {
+    height: max(600px, min(880px, calc(100dvh - 150px)));
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--nx-line) transparent;
+    border-radius: inherit;
+    padding: clamp(20px, 2.2vw, 36px) clamp(24px, 3.2vw, 50px) 56px;
+  }
+  .nx-glass .app-card {
+    border: 1px solid var(--nx-rim);
+    border-radius: 22px;
+    background: linear-gradient(144deg, var(--nx-card-light), transparent 66%), var(--nx-card);
+    box-shadow: inset 0 1px 1px var(--nx-edge-light), inset 0 -1px 1px var(--nx-edge-shade), 0 6px 18px rgb(var(--nx-shadow) / 8%);
+  }
+  .nx-glass .app-rise { animation: none; }
+  .nx-glass .app-input { background: var(--nx-raised); border-color: var(--nx-line); }
+  .nx-inner { background: var(--nx-inner); border: 1px solid var(--nx-line); box-shadow: inset 0 1px 0 var(--nx-gloss); }
+  .nx-raised { background: var(--nx-raised); }
+  .nx-pick { background: var(--nx-pick); color: #111a2b; box-shadow: inset 0 1px 0 #fff, 0 2px 7px rgb(var(--nx-shadow) / 16%); }
+
+  /* Indicateur « teinté » (équivalent de la carte turquoise du modèle, en bleu égéen) */
+  .nx-tinted {
+    color: #f6f2ea !important;
+    border-color: rgb(214 226 244 / 45%) !important;
+    background: radial-gradient(ellipse at 5% -20%, #7891b3, transparent 68%), linear-gradient(145deg, #4f6788, #26354f) !important;
+    box-shadow: inset 0 1px 2px rgb(230 238 250 / 45%), 0 6px 14px rgb(31 45 70 / 20%) !important;
+  }
+  .nx-tinted .app-label, .nx-tinted p { color: rgb(246 242 234 / 78%); }
+
+  /* Orbe : petit miroir d'eau (arche et reflet) */
+  .nx-orb {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 34% 26%, #fffaf2 6%, #d9b8ae 26%, transparent 58%),
+      radial-gradient(ellipse at 66% 58%, #a9bedb, #4f6788 55%, #111a2b 82%);
+    box-shadow: inset 0 0 0 0.75px rgb(255 250 242 / 70%), inset 0 -2px 5px #26354f, 0 0 0 3px rgb(79 103 136 / 14%), 0 2px 8px rgb(17 26 43 / 30%);
+  }
+  .nx-prompt { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; animation: nx-type 0.74s steps(28, end) both; }
+  @keyframes nx-type { from { clip-path: inset(0 100% 0 0); } }
+
+  /* Docks */
+  .nx-dock { position: absolute; z-index: 30; display: flex; align-items: center; gap: 3px; padding: 4px; border-radius: 999px; }
+  .nx-dock-side { flex-direction: column; left: -26px; top: clamp(70px, 15vh, 150px); }
+  .nx-dock-bottom { left: 50%; bottom: -26px; translate: -50% 0; }
+  .nx-dock-link {
+    position: relative; z-index: 1; display: flex; gap: 7px; justify-content: center; align-items: center;
+    min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 12.5px; white-space: nowrap; text-decoration: none;
+    color: var(--color-encre);
+  }
+  .nx-dock-side .nx-dock-link { padding: 0; }
+  .nx-dock-link:not([aria-current="page"]):hover { background: var(--nx-inner); }
+  .nx-dock-indicator {
+    position: absolute; inset: 0 auto auto 0; pointer-events: none; visibility: hidden; border-radius: 999px;
+    background: var(--nx-pick); box-shadow: inset 0 1px 0 #fff, 0 2px 7px rgb(var(--nx-shadow) / 18%);
+  }
+  .nx-dock-indicator[data-ready="true"] {
+    visibility: visible;
+    transition: transform 0.36s cubic-bezier(0.24, 0.89, 0.26, 1), width 0.36s cubic-bezier(0.24, 0.89, 0.26, 1), height 0.36s cubic-bezier(0.24, 0.89, 0.26, 1);
+  }
+  .nx-dock-tip {
+    display: none; position: absolute; left: calc(100% + 8px); pointer-events: none; padding: 6px 10px; border-radius: 8px;
+    background: var(--nx-surface); color: var(--color-encre); border: 1px solid var(--nx-rim); box-shadow: 0 3px 8px rgb(var(--nx-shadow) / 18%);
+  }
+  .nx-dock-side .nx-dock-link:is(:hover, :focus-visible) .nx-dock-tip { display: inline; }
+  .nx-dock-side .nx-dock-text, .nx-dock-short { display: none; }
+  .nx-dock-badge {
+    position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px;
+    display: grid; place-items: center; font-size: 10px; line-height: 1; background: #96433a; color: #f6f2ea;
+  }
+
+  /* Graphiques */
+  .nx-bar { transform-origin: center bottom; }
+  .nx-grow { transform-origin: left center; }
+
+  @media (max-width: 1060px) {
+    .nx-stage-scroll { padding-inline: 30px; }
+  }
+  @media (max-width: 760px) {
+    .nx-stage { border-radius: 24px; }
+    .nx-stage-scroll { height: auto; overflow: visible; padding: 16px 13px 20px; }
+    .nx-dock-side { display: none; }
+    .nx-dock-bottom { position: fixed; inset: auto 10px calc(10px + env(safe-area-inset-bottom)); translate: none; justify-content: space-between; }
+    .nx-dock-bottom .nx-dock-link { flex: 1; flex-direction: column; gap: 2px; padding: 3px 4px; min-height: 48px; font-size: 10px; line-height: 1.2; }
+    .nx-dock-bottom .nx-dock-text { display: none; }
+    .nx-dock-bottom .nx-dock-short { display: inline; }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .nx-rail, .nx-stage, .nx-glass .app-card { background: var(--nx-surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+}

@@ -1,5 +1,10 @@
 node_modules
 .next
+.env
+.env.*
+!.env.example
+.env.copy
+.env.local
 preview-build
 out
 next-env.d.ts

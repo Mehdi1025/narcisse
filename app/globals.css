@@ -11,6 +11,8 @@
   --color-sauge: #7e8f80;
   --color-rose: #d9b8ae;
   --color-gris: #3b4252;
+  --color-voile: #ffffff;
+  --color-sauge-fonce: #4d5e50;
   --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-sans: var(--font-jost), "Jost", system-ui, sans-serif;
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
