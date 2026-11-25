@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import DashboardApp from "@/components/app/DashboardApp";
+import { loadProfileByUserId } from "@/lib/auth/loadProfile";
+import { profileFromRow } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import type { WorkerId } from "@/lib/app/types";
 
 export const metadata: Metadata = { title: "Espace équipe" };
 
@@ -13,9 +14,9 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/dashboard");
 
-  const { data: row } = await supabase.from("profiles").select("role, worker_id").eq("id", user.id).maybeSingle();
-  if (!row || row.role === "admin") redirect(row?.role === "admin" ? "/admin" : "/login");
-  if (row.role !== "employee" || !row.worker_id) redirect("/login");
+  const row = await loadProfileByUserId(user.id);
+  const appProfile = profileFromRow(row);
+  if (!appProfile || appProfile === "admin") redirect(appProfile === "admin" ? "/admin" : "/login");
 
-  return <DashboardApp initialProfile={row.worker_id as WorkerId} />;
+  return <DashboardApp initialProfile={appProfile} />;
 }

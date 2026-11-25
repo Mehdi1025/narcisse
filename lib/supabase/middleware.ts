@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { loadProfileByUserId } from "@/lib/auth/loadProfile";
 import { dashboardForProfile } from "@/lib/auth/login";
 import { profileFromRow } from "@/lib/auth/session";
 import { getSupabasePublishableKey, getSupabaseUrl } from "@/lib/supabase/env";
@@ -52,7 +53,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const { data: row } = await supabase.from("profiles").select("role, worker_id").eq("id", user.id).maybeSingle();
+  const row = await loadProfileByUserId(user.id);
   const appProfile = profileFromRow(row);
   if (!appProfile) {
     const url = request.nextUrl.clone();
