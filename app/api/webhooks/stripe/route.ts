@@ -24,6 +24,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
+  if (event.type === "checkout.session.expired") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const orderId = session.metadata?.order_id;
+    if (orderId) {
+      const db = createAdminClient();
+      await db.rpc("release_stock_reservation_for_order", {
+        p_order_id: orderId,
+        p_note: "Session Stripe expirée",
+      });
+      await db
+        .from("shop_orders")
+        .update({ status: "cancelled", payment_status: "failed" })
+        .eq("id", orderId)
+        .eq("payment_status", "pending");
+    }
+  }
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.metadata?.order_id;

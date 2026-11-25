@@ -101,5 +101,11 @@ export async function createPendingShopOrder(
     return { error: linesErr.message };
   }
 
+  const { error: reserveErr } = await db.rpc("reserve_stock_for_order", { p_order_id: order.id });
+  if (reserveErr) {
+    await db.from("shop_orders").delete().eq("id", order.id);
+    return { error: reserveErr.message };
+  }
+
   return { order, lines: lineRows };
 }
