@@ -27,7 +27,12 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_my_profile: {
+        Args: Record<string, never>;
+        Returns: { role: AppRole; worker_id: string | null }[];
+      };
+    };
     Enums: Record<string, never>;
   };
 };

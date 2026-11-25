@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import DashboardApp from "@/components/app/DashboardApp";
-import { loadProfileByUserId } from "@/lib/auth/loadProfile";
+import { loadProfileFromSession } from "@/lib/auth/loadProfile";
 import { profileFromRow } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,7 +14,7 @@ export default async function AdminPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/admin");
 
-  const row = await loadProfileByUserId(user.id);
+  const row = await loadProfileFromSession(supabase);
   if (profileFromRow(row) !== "admin") redirect("/dashboard");
 
   return <DashboardApp initialProfile="admin" />;

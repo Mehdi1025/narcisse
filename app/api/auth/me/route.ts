@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadProfileByUserId } from "@/lib/auth/loadProfile";
+import { loadProfileFromSession } from "@/lib/auth/loadProfile";
 import { profileFromRow } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,10 +13,14 @@ export async function GET() {
     return NextResponse.json({ error: "non_connecte" }, { status: 401 });
   }
 
-  const row = await loadProfileByUserId(user.id);
+  const row = await loadProfileFromSession(supabase);
   if (!row) {
     return NextResponse.json(
-      { error: "profil_lecture", detail: "Profil introuvable ou SUPABASE_SERVICE_ROLE_KEY manquant sur Vercel." },
+      {
+        error: "profil_lecture",
+        detail:
+          "Profil introuvable. Exécutez 005_sync_profiles.sql puis 007_get_my_profile.sql dans Supabase.",
+      },
       { status: 500 },
     );
   }
