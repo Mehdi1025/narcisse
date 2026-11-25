@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { gsap, ScrollTrigger, useGSAP, MQ } from "@/lib/gsap";
 import { euro, shop, universes, type Product, type UniverseKey } from "@/content/boutique";
@@ -212,7 +213,7 @@ function ProductPanel({ product, close }: { product: Product | null; close: () =
 }
 
 function CartPanel() {
-  const { lines, total, open, setOpen, setQty } = useCart();
+  const { lines, total, open, setOpen, setQty, canCheckout } = useCart();
   return (
     <Panel open={open} close={() => setOpen(false)} label="Panier">
       <div className="flex min-h-full flex-col p-8">
@@ -251,10 +252,18 @@ function CartPanel() {
                 <span className="eyebrow text-gris/60">Total</span>
                 <span className="display text-[40px]">{euro(total)}</span>
               </div>
-              <button type="button" className="btn btn-fill mt-6 w-full cursor-not-allowed opacity-60" disabled>
-                <span className="btn-label">Commander</span>
-              </button>
-              <p className="mt-3 text-center text-[13px] text-gris/60">{shop.checkoutNote}</p>
+              {canCheckout ? (
+                <Link href="/boutique/commande" className="btn btn-fill mt-6 block w-full text-center" onClick={() => setOpen(false)}>
+                  <span className="btn-label">Commander</span>
+                </Link>
+              ) : (
+                <button type="button" className="btn btn-fill mt-6 w-full cursor-not-allowed opacity-60" disabled>
+                  <span className="btn-label">Commander</span>
+                </button>
+              )}
+              <p className="mt-3 text-center text-[13px] text-gris/60">
+                {canCheckout ? shop.checkoutNote : "Catalogue Supabase requis (produits publiés avec stock)."}
+              </p>
             </div>
           </>
         )}

@@ -32,6 +32,14 @@ function parseBody(body: unknown): ProductInput | null {
     featured: Boolean(o.featured),
     published: Boolean(o.published),
     sort_order: typeof o.sort_order === "number" ? o.sort_order : Number(o.sort_order) || 0,
+    stock_on_hand:
+      o.stock_on_hand !== undefined && o.stock_on_hand !== ""
+        ? Math.max(0, Math.round(Number(o.stock_on_hand)))
+        : undefined,
+    stock_alert_threshold:
+      o.stock_alert_threshold !== undefined && o.stock_alert_threshold !== ""
+        ? Math.max(0, Math.round(Number(o.stock_alert_threshold)))
+        : undefined,
   };
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import ShopOrders from "./ShopOrders";
 import { boutique, type ProductKey } from "@/content/landing";
 import { slugify, formatPrice } from "@/lib/boutique/format";
 import { UNIVERSE_LABEL } from "@/lib/boutique/labels";
@@ -22,6 +23,8 @@ type FormState = {
   featured: boolean;
   published: boolean;
   sort_order: string;
+  stock_on_hand: string;
+  stock_alert_threshold: string;
 };
 
 const emptyForm = (): FormState => ({
@@ -35,6 +38,8 @@ const emptyForm = (): FormState => ({
   featured: false,
   published: false,
   sort_order: "0",
+  stock_on_hand: "0",
+  stock_alert_threshold: "3",
 });
 
 function euroToCents(v: string): number | null {
@@ -57,11 +62,14 @@ function rowToForm(p: ProductRow): FormState {
     featured: p.featured,
     published: p.published,
     sort_order: String(p.sort_order),
+    stock_on_hand: String(p.stock_on_hand ?? 0),
+    stock_alert_threshold: String(p.stock_alert_threshold ?? 3),
   };
 }
 
 export default function AdminBoutique() {
   const toast = useToast();
+  const [tab, setTab] = useState<"catalog" | "orders">("catalog");
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"create" | ProductRow | null>(null);
@@ -126,6 +134,8 @@ export default function AdminBoutique() {
       featured: form.featured,
       published: form.published,
       sort_order: Number(form.sort_order) || 0,
+      stock_on_hand: Math.max(0, Math.round(Number(form.stock_on_hand) || 0)),
+      stock_alert_threshold: Math.max(0, Math.round(Number(form.stock_alert_threshold) || 3)),
     };
 
     setSaving(true);
@@ -195,8 +205,28 @@ export default function AdminBoutique() {
   const publishedCount = products.filter((p) => p.published).length;
   const featuredCount = products.filter((p) => p.featured && p.published).length;
 
+  if (tab === "orders") {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <TabBtn active={false} onClick={() => setTab("catalog")}>
+            Catalogue
+          </TabBtn>
+          <TabBtn active>Commandes</TabBtn>
+        </div>
+        <ShopOrders />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        <TabBtn active>Catalogue</TabBtn>
+        <TabBtn active={false} onClick={() => setTab("orders")}>
+          Commandes
+        </TabBtn>
+      </div>
       <Card eyebrow="E-commerce" title="Gérer la boutique" className="!bg-encre/[0.03]">
         <p className="text-[13.5px] text-encre/70">
           Catalogue en ligne : vitrine sur la page d&apos;accueil, collection complète sur le site. Publiez, mettez en avant (4 max conseillés) et modifiez les fiches produits.
@@ -232,7 +262,7 @@ export default function AdminBoutique() {
             <table className="w-full min-w-[880px] text-left text-[13px]">
               <thead>
                 <tr className="border-b border-encre/[0.08] text-encre/50">
-                  {["", "Produit", "Univers", "Prix", "Ordre", "Vitrine", "Publié", ""].map((h) => (
+                  {["", "Produit", "Univers", "Prix", "Stock", "Ordre", "Vitrine", "Publié", ""].map((h) => (
                     <th key={h} className="px-5 py-3 font-medium app-label">
                       {h}
                     </th>
@@ -260,6 +290,15 @@ export default function AdminBoutique() {
                     </td>
                     <td className="px-5 py-3 text-encre/65">{UNIVERSE_LABEL[p.universe]}</td>
                     <td className="px-5 py-3 tabular-nums">{formatPrice(p.price_cents) ?? "—"}</td>
+                    <td className="px-5 py-3 tabular-nums">
+                      {typeof p.stock_on_hand === "number" ? (
+                        <span className={p.stock_on_hand <= (p.stock_alert_threshold ?? 3) ? "text-bordeaux" : ""}>
+                          {Math.max(0, (p.stock_on_hand ?? 0) - (p.stock_reserved ?? 0))} / {p.stock_on_hand}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                     <td className="px-5 py-3 tabular-nums text-encre/55">{p.sort_order}</td>
                     <td className="px-5 py-3">
                       <Toggle on={p.featured} onClick={() => toggle(p, "featured")} label={p.featured ? "Oui" : "Non"} />
@@ -322,9 +361,17 @@ export default function AdminBoutique() {
                 <img src={form.image_url} alt="Aperçu" className="h-full w-full object-cover" />
               </div>
             )}
-            <Field label="Ordre d'affichage">
-              <input className="app-input w-28" type="number" value={form.sort_order} onChange={(e) => patchField("sort_order", e.target.value)} />
-            </Field>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label="Stock (site + comptoir)" hint="Unités en rayon.">
+                <input className="app-input" type="number" min={0} value={form.stock_on_hand} onChange={(e) => patchField("stock_on_hand", e.target.value)} />
+              </Field>
+              <Field label="Seuil d'alerte" hint="Défaut 3 (H-10).">
+                <input className="app-input" type="number" min={0} value={form.stock_alert_threshold} onChange={(e) => patchField("stock_alert_threshold", e.target.value)} />
+              </Field>
+              <Field label="Ordre d'affichage">
+                <input className="app-input" type="number" value={form.sort_order} onChange={(e) => patchField("sort_order", e.target.value)} />
+              </Field>
+            </div>
             <div className="flex flex-wrap gap-4 text-[13px]">
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={form.featured} onChange={(e) => patchField("featured", e.target.checked)} />
@@ -347,6 +394,30 @@ export default function AdminBoutique() {
         </Modal>
       )}
     </div>
+  );
+}
+
+function TabBtn({
+  children,
+  active,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={active && !onClick}
+      className={cx(
+        "h-9 rounded-full px-4 text-[13px]",
+        active ? "bg-encre text-ivoire" : "bg-encre/[0.06] hover:bg-encre/10",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 

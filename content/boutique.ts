@@ -2,6 +2,8 @@
 export type UniverseKey = "skincare" | "art-de-vivre" | "developpement" | "editions";
 
 export type Product = {
+  /** UUID Supabase — absent sur le catalogue statique de démo. */
+  id?: string;
   ref: string;
   universe: UniverseKey;
   name: string;
@@ -9,6 +11,8 @@ export type Product = {
   price: number;
   priceFrom?: boolean;
   image: string;
+  /** Disponible à la vente en ligne (on_hand − reserved). */
+  stockAvailable?: number;
 };
 
 export const universes: { key: UniverseKey; name: string; short: string; line: string; tone: string }[] = [
@@ -44,7 +48,7 @@ export const shop = {
   titleA: "L'art de prendre soin de soi,",
   titleB: "jusque chez soi.",
   intro: "Des essentiels pour la beauté, le bien-être et le développement personnel, choisis dans le prolongement de notre philosophie.",
-  checkoutNote: "Le paiement en ligne arrive bientôt.",
+  checkoutNote: "Paiement sécurisé par carte — retrait sur place au salon.",
   imageNote: "Visuel d'illustration — la photo du produit arrive bientôt.",
 };
 

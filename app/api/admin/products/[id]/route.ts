@@ -39,6 +39,16 @@ function parsePatch(body: unknown): Partial<ProductInput> | null {
     if (!Number.isFinite(n)) return null;
     patch.sort_order = n;
   }
+  if ("stock_on_hand" in o) {
+    const n = typeof o.stock_on_hand === "number" ? o.stock_on_hand : Number(o.stock_on_hand);
+    if (!Number.isFinite(n) || n < 0) return null;
+    patch.stock_on_hand = Math.round(n);
+  }
+  if ("stock_alert_threshold" in o) {
+    const n = typeof o.stock_alert_threshold === "number" ? o.stock_alert_threshold : Number(o.stock_alert_threshold);
+    if (!Number.isFinite(n) || n < 0) return null;
+    patch.stock_alert_threshold = Math.round(n);
+  }
 
   return patch;
 }

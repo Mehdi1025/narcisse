@@ -8,6 +8,7 @@ type Ctx = {
   lines: (Line & { product: Product })[];
   count: number;
   total: number;
+  canCheckout: boolean;
   add: (ref: string, qty?: number) => void;
   setQty: (ref: string, qty: number) => void;
   open: boolean;
@@ -40,18 +41,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [raw]);
 
-  const add = useCallback((ref: string, qty = 1) => {
-    setRaw((l) =>
-      l.some((x) => x.ref === ref)
-        ? l.map((x) => (x.ref === ref ? { ...x, qty: Math.min(9, x.qty + qty) } : x))
-        : [...l, { ref, qty }],
-    );
-    setBump((b) => b + 1);
-  }, []);
+  const maxQty = useCallback(
+    (product: Product) => {
+      if (product.stockAvailable == null) return 9;
+      return Math.min(9, Math.max(0, product.stockAvailable));
+    },
+    [],
+  );
 
-  const setQty = useCallback((ref: string, qty: number) => {
-    setRaw((l) => (qty <= 0 ? l.filter((x) => x.ref !== ref) : l.map((x) => (x.ref === ref ? { ...x, qty: Math.min(9, qty) } : x))));
-  }, []);
+  const add = useCallback(
+    (ref: string, qty = 1) => {
+      const product = products.find((p) => p.ref === ref);
+      if (!product?.id) return;
+      if (product.stockAvailable !== undefined && product.stockAvailable <= 0) return;
+      setRaw((l) => {
+        const cap = maxQty(product);
+        if (cap <= 0) return l;
+        return l.some((x) => x.ref === ref)
+          ? l.map((x) => (x.ref === ref ? { ...x, qty: Math.min(cap, x.qty + qty) } : x))
+          : [...l, { ref, qty: Math.min(cap, qty) }];
+      });
+      setBump((b) => b + 1);
+    },
+    [products, maxQty],
+  );
+
+  const setQty = useCallback(
+    (ref: string, qty: number) => {
+      const product = products.find((p) => p.ref === ref);
+      const cap = product ? maxQty(product) : 9;
+      setRaw((l) =>
+        qty <= 0 ? l.filter((x) => x.ref !== ref) : l.map((x) => (x.ref === ref ? { ...x, qty: Math.min(cap, qty) } : x)),
+      );
+    },
+    [products, maxQty],
+  );
 
   const value = useMemo(() => {
     const lines = raw
@@ -60,10 +84,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return product ? { ...l, product } : null;
       })
       .filter((x): x is Line & { product: Product } => x != null);
+    const canCheckout =
+      lines.length > 0 &&
+      lines.every((l) => Boolean(l.product.id)) &&
+      lines.every((l) => l.product.stockAvailable === undefined || l.product.stockAvailable >= l.qty);
+
     return {
       lines,
       count: lines.reduce((a, l) => a + l.qty, 0),
       total: lines.reduce((a, l) => a + l.qty * l.product.price, 0),
+      canCheckout,
       add,
       setQty,
       open,

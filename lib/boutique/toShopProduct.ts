@@ -8,7 +8,11 @@ export function slugToRef(slug: string): string {
 
 export function productRowToShop(row: ProductRow): Product {
   const ref = slugToRef(row.slug);
+  const onHand = row.stock_on_hand ?? 0;
+  const reserved = row.stock_reserved ?? 0;
+  const available = Math.max(0, onHand - reserved);
   return {
+    id: row.id,
     ref,
     universe: row.universe,
     name: row.name,
@@ -16,5 +20,6 @@ export function productRowToShop(row: ProductRow): Product {
     price: (row.price_cents ?? 0) / 100,
     priceFrom: ref === "NAR-ED-03",
     image: row.image_url ?? `/boutique/photos/${ref}.jpg`,
+    stockAvailable: row.stock_on_hand != null ? available : undefined,
   };
 }
