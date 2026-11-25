@@ -1,4 +1,4 @@
-export type AppRole = "admin" | "lina" | "t2";
+export type AppRole = "admin" | "employee";
 
 export type ProfileRow = {
   id: string;

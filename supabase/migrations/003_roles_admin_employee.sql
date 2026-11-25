@@ -1,0 +1,2 @@
+-- Remplacé par 004_repair_admin_employee.sql (ordre correct pour Postgres).
+-- Ne pas exécuter ce fichier.

@@ -10,11 +10,15 @@
 
 | Identifiant à l’écran | E-mail technique (Supabase) | Rôle | Espace |
 |----------------------|----------------------------|------|--------|
-| `admin` | admin@narcisse.local | admin | `/admin` |
-| `lina` | lina@narcisse.local | lina | `/dashboard` |
-| `travailleuse2` ou `t2` ou `travailleuse deux` | t2@narcisse.local | t2 | `/dashboard` |
+| Identifiant | E-mail | **Rôle (base)** | **Travailleuse** (`worker_id`) | URL |
+|-------------|--------|-----------------|--------------------------------|-----|
+| `admin` | admin@narcisse.local | `admin` | — | `/admin` |
+| `lina` | lina@narcisse.local | `employee` | `lina` | `/dashboard` |
+| `travailleuse2` | t2@narcisse.local | `employee` | `t2` | `/dashboard` |
 
-**Un seul `/dashboard`** : Lina et Travailleuse 2 partagent l’URL ; le contenu dépend du compte connecté.
+**Rôles applicatifs** : seulement **`admin`** et **`employee`**. Lina vs Travailleuse 2 = colonne **`worker_id`**, pas le rôle.
+
+Après `001` + `002`, exécute **`003_roles_admin_employee.sql`** puis `npm run seed:users` (ou le SQL profils).
 
 ## Auth Supabase
 

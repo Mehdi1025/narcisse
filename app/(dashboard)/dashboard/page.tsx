@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   const { data: row } = await supabase.from("profiles").select("role, worker_id").eq("id", user.id).maybeSingle();
   if (!row || row.role === "admin") redirect(row?.role === "admin" ? "/admin" : "/login");
-  if (row.role !== "lina" && row.role !== "t2") redirect("/login");
+  if (row.role !== "employee" || !row.worker_id) redirect("/login");
 
-  return <DashboardApp initialProfile={row.role as WorkerId} />;
+  return <DashboardApp initialProfile={row.worker_id as WorkerId} />;
 }

@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { dashboardForRole, normalizeAppPath, type SessionRole } from "@/lib/auth/login";
+import { dashboardForProfile } from "@/lib/auth/login";
+import { profileFromRow } from "@/lib/auth/session";
 import { getSupabasePublishableKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 const LEGACY: Record<string, string> = {
@@ -51,29 +52,28 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-
-  const role = profile?.role as SessionRole | undefined;
-  if (!role) {
+  const { data: row } = await supabase.from("profiles").select("role, worker_id").eq("id", user.id).maybeSingle();
+  const appProfile = profileFromRow(row);
+  if (!appProfile) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("error", "profil");
     return NextResponse.redirect(url);
   }
 
-  if (isAdmin && role !== "admin") {
+  if (isAdmin && appProfile !== "admin") {
     const url = request.nextUrl.clone();
-    url.pathname = dashboardForRole(role);
+    url.pathname = dashboardForProfile(appProfile);
     return NextResponse.redirect(url);
   }
 
-  if (isEmploye && role === "admin") {
+  if (isEmploye && appProfile === "admin") {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.redirect(url);
   }
 
-  if (isEmploye && role !== "lina" && role !== "t2") {
+  if (isEmploye && appProfile !== "lina" && appProfile !== "t2") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

@@ -2,8 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { dashboardForRole, normalizeAppPath, resolveLoginEmail } from "@/lib/auth/login";
-import type { SessionRole } from "@/lib/auth/login";
+import { dashboardForProfile, normalizeAppPath, resolveLoginEmail } from "@/lib/auth/login";
+import { profileFromRow } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginForm() {
@@ -31,16 +31,24 @@ export default function LoginForm() {
       setPending(false);
       return;
     }
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
-    const role = profile?.role as SessionRole | undefined;
-    if (!role) {
-      setError("Compte sans profil. Exécutez npm run seed:users.");
+    const me = await fetch("/api/auth/me", { credentials: "same-origin" });
+    const body = (await me.json()) as { profile?: string; error?: string; detail?: string };
+    const appProfile =
+      me.ok && body.profile
+        ? (body.profile as import("@/lib/app/types").Profile)
+        : null;
+    if (!appProfile) {
+      const hint =
+        body.error === "profil_manquant"
+          ? "Aucune ligne dans public.profiles pour ce compte. Collez le SQL de synchronisation dans Supabase (voir ci-dessous)."
+          : body.detail ?? body.error ?? "profil";
+      setError(`Compte sans profil (${hint}).`);
       await supabase.auth.signOut();
       setPending(false);
       return;
     }
     const dest = normalizeAppPath(next);
-    router.replace(dest ?? dashboardForRole(role));
+    router.replace(dest ?? dashboardForProfile(appProfile));
     router.refresh();
   };
 

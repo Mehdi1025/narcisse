@@ -17,10 +17,10 @@ export function resolveLoginEmail(identifier: string): string | null {
   return EMAIL_BY_USERNAME[compact] ?? EMAIL_BY_USERNAME[key] ?? null;
 }
 
-export type SessionRole = "admin" | "lina" | "t2";
+import type { Profile } from "@/lib/app/types";
 
-export function dashboardForRole(role: SessionRole): "/admin" | "/dashboard" {
-  return role === "admin" ? "/admin" : "/dashboard";
+export function dashboardForProfile(profile: Profile): "/admin" | "/dashboard" {
+  return profile === "admin" ? "/admin" : "/dashboard";
 }
 
 /** Anciennes URLs → nouvelles (après login ou redirection). */

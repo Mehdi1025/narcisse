@@ -20,9 +20,9 @@ function loadEnv() {
 }
 
 const USERS = [
-  { email: "admin@narcisse.local", password: "password", username: "admin", role: "admin", display_name: "Administratrice" },
-  { email: "lina@narcisse.local", password: "password", username: "lina", role: "lina", display_name: "Lina" },
-  { email: "t2@narcisse.local", password: "password", username: "travailleuse2", role: "t2", display_name: "Travailleuse 2" },
+  { email: "admin@narcisse.local", password: "password", username: "admin", role: "admin", worker_id: null, display_name: "Administratrice" },
+  { email: "lina@narcisse.local", password: "password", username: "lina", role: "employee", worker_id: "lina", display_name: "Lina" },
+  { email: "t2@narcisse.local", password: "password", username: "travailleuse2", role: "employee", worker_id: "t2", display_name: "Travailleuse 2" },
 ];
 
 loadEnv();
@@ -42,12 +42,12 @@ for (const u of USERS) {
   if (existing) {
     await admin.auth.admin.updateUserById(existing.id, {
       password: u.password,
-      user_metadata: { username: u.username, role: u.role, display_name: u.display_name, worker_id: u.role === "admin" ? null : u.role },
+      user_metadata: { username: u.username, role: u.role, display_name: u.display_name, worker_id: u.worker_id },
     });
     await admin.from("profiles").upsert({
       id: existing.id,
       role: u.role,
-      worker_id: u.role === "admin" ? null : u.role,
+      worker_id: u.worker_id,
       username: u.username,
       display_name: u.display_name,
     });
@@ -62,7 +62,7 @@ for (const u of USERS) {
       username: u.username,
       role: u.role,
       display_name: u.display_name,
-      worker_id: u.role === "admin" ? null : u.role,
+      worker_id: u.worker_id,
     },
   });
   if (error) {
