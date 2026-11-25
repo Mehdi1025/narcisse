@@ -80,18 +80,32 @@ export default function Overview({ go }: { go: (v: ViewId) => void }) {
           <Stat className="!rounded-2xl !p-4" label="À affecter" value={queue.length} tone={queue.length ? "text-bordeaux" : undefined} hint="Sans préférence" />
           <Stat className="!rounded-2xl !p-4" label="Tâches à traiter" value={toValidate.length} hint="Demandes et validations" />
           <Stat className="!rounded-2xl !p-4" label="Indisponibilités" value={offs.length} hint="En attente de décision" />
-          <button
-            type="button"
-            onClick={() => go("boutique")}
-            className="col-span-2 flex items-center justify-between rounded-2xl border border-encre/10 bg-ivoire/40 px-4 py-3 text-left transition-colors hover:border-rose/40 hover:bg-ivoire/70"
-          >
-            <span>
-              <span className="app-label block">Boutique e-commerce</span>
-              <span className="mt-1 block font-serif text-[18px]">Gérer le catalogue</span>
-              <span className="mt-0.5 block text-[12px] text-encre/55">Produits, vitrine et collection en ligne</span>
-            </span>
-            <Icon name="arrow" size={16} />
-          </button>
+          <div className="col-span-2 grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => go("boutique")}
+              className="flex items-center justify-between rounded-2xl border border-encre/10 bg-ivoire/40 px-4 py-3 text-left transition-colors hover:border-rose/40 hover:bg-ivoire/70"
+            >
+              <span>
+                <span className="app-label block">Boutique e-commerce</span>
+                <span className="mt-1 block font-serif text-[18px]">Gérer le catalogue</span>
+                <span className="mt-0.5 block text-[12px] text-encre/55">Produits, vitrine et collection en ligne</span>
+              </span>
+              <Icon name="arrow" size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => go("events")}
+              className="flex items-center justify-between rounded-2xl border border-encre/10 bg-ivoire/40 px-4 py-3 text-left transition-colors hover:border-sauge/50 hover:bg-ivoire/70"
+            >
+              <span>
+                <span className="app-label block">Événements</span>
+                <span className="mt-1 block font-serif text-[18px]">Valider les ateliers</span>
+                <span className="mt-0.5 block text-[12px] text-encre/55">Propositions de l&apos;équipe et inscriptions</span>
+              </span>
+              <Icon name="arrow" size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Semaine */}

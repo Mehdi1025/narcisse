@@ -35,7 +35,9 @@ const VIEWS: Item[] = [
   { id: "finances", label: "Finances", short: "Finances", icon: Euro, description: "Encaissements et exports — module à venir.", hint: "Module à venir", soon: true },
   { id: "settings", label: "Paramètres", short: "Réglages", icon: Settings, description: "Horaires, prestations et comptes — module à venir.", hint: "Module à venir", soon: true },
 ];
-const DOCK = VIEWS.filter((v) => ["overview", "agenda", "reservations", "tasks", "team", "boutique"].includes(v.id));
+const DOCK = VIEWS.filter((v) =>
+  ["overview", "agenda", "reservations", "tasks", "team", "boutique", "events"].includes(v.id),
+);
 
 export default function GlassShell({ view, go, children }: { view: ViewId; go: (v: ViewId, p?: Profile) => void; children: ReactNode }) {
   const { state, dispatch } = useStore();

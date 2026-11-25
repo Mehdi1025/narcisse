@@ -120,16 +120,23 @@ export default function AdminWorkshops() {
         ) : (
           <ul className="divide-y divide-encre/[0.06]">
             {filtered.map((w) => (
-              <li key={w.id}>
-                <button type="button" onClick={() => openDetail(w)} className="flex w-full flex-wrap items-start justify-between gap-4 p-5 text-left hover:bg-encre/[0.02]">
+              <li key={w.id} className="flex flex-wrap items-center gap-3 p-5 hover:bg-encre/[0.02]">
+                <button type="button" onClick={() => openDetail(w)} className="min-w-0 flex-1 text-left">
                   <div>
                     <p className="font-medium">{w.title}</p>
                     <p className="mt-1 text-[12.5px] text-encre/55">
                       Proposé par {w.proposed_by} · {new Date(w.starts_at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })} · {w.capacity} places
                     </p>
                   </div>
-                  <span className="text-[12px] text-encre/50">{STATUS[w.status]}</span>
                 </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-[12px] text-encre/50">{STATUS[w.status]}</span>
+                  {(w.status === "pending" || w.status === "draft") && (
+                    <Button size="sm" onClick={() => openDetail(w)}>
+                      Valider
+                    </Button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
