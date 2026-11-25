@@ -4,6 +4,8 @@
 
 1. `014_shop_orders.sql`
 2. `015_products_stock.sql` (stock, réservations, mouvements — après les commandes)
+3. `016_seed_test_products.sql` (optionnel — catalogue test)
+4. `017_boutique_grants_service_role.sql` (obligatoire si « permission denied » au paiement)
 
 ## Variables d’environnement (Vercel + local)
 
