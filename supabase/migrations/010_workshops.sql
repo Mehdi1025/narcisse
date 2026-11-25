@@ -61,7 +61,7 @@ create policy worker_workshops_insert on public.workshops for insert to authenti
 
 create policy worker_workshops_update on public.workshops for update to authenticated
   using (public.is_employee() and proposed_by = public.current_worker_id() and status in ('draft', 'pending', 'rejected'))
-  with check (public.is_employee() and proposed_by = public.current_worker_id() and status in ('draft', 'pending'));
+  with check (public.is_employee() and proposed_by = public.current_worker_id() and status in ('draft', 'pending', 'rejected'));
 
 -- Public : ateliers publiés
 create policy workshops_public_select on public.workshops for select to anon, authenticated
@@ -132,4 +132,5 @@ $$;
 
 grant execute on function public.register_for_workshop(uuid, text, text, text) to anon, authenticated;
 grant select on public.workshops to anon;
-grant select on public.workshop_registrations to authenticated;
+grant select, insert, update, delete on public.workshops to authenticated;
+grant select, insert, update, delete on public.workshop_registrations to authenticated;
