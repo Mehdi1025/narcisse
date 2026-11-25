@@ -16,7 +16,7 @@ import WorkerTasks from "./worker/Tasks";
 import Unavailability from "./worker/Unavailability";
 import Notifications from "./Notifications";
 
-/** Lit la vue dans l'ancre « #profil/vue » ; le profil reste celui de la page (/dashboard_lina, etc.). */
+/** Lit la vue dans l'ancre « #profil/vue » ; le profil reste celui du compte connecté (/dashboard). */
 function readHash(lockedProfile: Profile): { profile: Profile; view: ViewId } {
   const [, v] = window.location.hash.replace(/^#\/?/, "").split("/");
   const views = NAV[lockedProfile === "admin" ? "admin" : "worker"].map((n) => n.id);

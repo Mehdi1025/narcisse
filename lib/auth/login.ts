@@ -19,6 +19,22 @@ export function resolveLoginEmail(identifier: string): string | null {
 
 export type SessionRole = "admin" | "lina" | "t2";
 
-export function dashboardForRole(role: SessionRole): "/dashboard_admin" | "/dashboard_employe" {
-  return role === "admin" ? "/dashboard_admin" : "/dashboard_employe";
+export function dashboardForRole(role: SessionRole): "/admin" | "/dashboard" {
+  return role === "admin" ? "/admin" : "/dashboard";
+}
+
+/** Anciennes URLs → nouvelles (après login ou redirection). */
+export function normalizeAppPath(path: string | null): "/admin" | "/dashboard" | null {
+  if (!path) return null;
+  if (path.startsWith("/dashboard_admin")) return "/admin";
+  if (
+    path.startsWith("/dashboard_employe") ||
+    path.startsWith("/dashboard_lina") ||
+    path.startsWith("/dashboard_travailleuse")
+  ) {
+    return "/dashboard";
+  }
+  if (path === "/admin" || path.startsWith("/admin/")) return "/admin";
+  if (path === "/dashboard" || path.startsWith("/dashboard/")) return "/dashboard";
+  return null;
 }

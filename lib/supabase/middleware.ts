@@ -1,10 +1,24 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { dashboardForRole, type SessionRole } from "@/lib/auth/login";
+import { dashboardForRole, normalizeAppPath, type SessionRole } from "@/lib/auth/login";
 import { getSupabasePublishableKey, getSupabaseUrl } from "@/lib/supabase/env";
+
+const LEGACY: Record<string, string> = {
+  "/dashboard_admin": "/admin",
+  "/dashboard_employe": "/dashboard",
+  "/dashboard_lina": "/dashboard",
+  "/dashboard_travailleuse-2": "/dashboard",
+};
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+
+  const path = request.nextUrl.pathname;
+  if (LEGACY[path]) {
+    const url = request.nextUrl.clone();
+    url.pathname = LEGACY[path];
+    return NextResponse.redirect(url);
+  }
 
   const supabase = createServerClient(getSupabaseUrl(), getSupabasePublishableKey(), {
     cookies: {
@@ -23,16 +37,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-  const isAdmin = path.startsWith("/dashboard_admin");
-  const isEmploye = path.startsWith("/dashboard_employe");
-  const isLegacyWorker = path.startsWith("/dashboard_lina") || path.startsWith("/dashboard_travailleuse-2");
-
-  if (isLegacyWorker) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard_employe";
-    return NextResponse.redirect(url);
-  }
+  const isAdmin = path === "/admin" || path.startsWith("/admin/");
+  const isEmploye = path === "/dashboard" || path.startsWith("/dashboard/");
 
   if (!isAdmin && !isEmploye) {
     return response;
@@ -63,7 +69,7 @@ export async function updateSession(request: NextRequest) {
 
   if (isEmploye && role === "admin") {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard_admin";
+    url.pathname = "/admin";
     return NextResponse.redirect(url);
   }
 

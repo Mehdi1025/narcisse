@@ -6,15 +6,15 @@ import type { WorkerId } from "@/lib/app/types";
 
 export const metadata: Metadata = { title: "Espace équipe" };
 
-export default async function DashboardEmployePage() {
+export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login?next=/dashboard_employe");
+  if (!user) redirect("/login?next=/dashboard");
 
   const { data: row } = await supabase.from("profiles").select("role, worker_id").eq("id", user.id).maybeSingle();
-  if (!row || row.role === "admin") redirect(row?.role === "admin" ? "/dashboard_admin" : "/login");
+  if (!row || row.role === "admin") redirect(row?.role === "admin" ? "/admin" : "/login");
   if (row.role !== "lina" && row.role !== "t2") redirect("/login");
 
   return <DashboardApp initialProfile={row.role as WorkerId} />;

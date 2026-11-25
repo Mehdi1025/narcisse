@@ -10,11 +10,11 @@
 
 | Identifiant à l’écran | E-mail technique (Supabase) | Rôle | Espace |
 |----------------------|----------------------------|------|--------|
-| `admin` | admin@narcisse.local | admin | `/dashboard_admin` |
-| `lina` | lina@narcisse.local | lina | `/dashboard_employe` |
-| `travailleuse2` ou `t2` ou `travailleuse deux` | t2@narcisse.local | t2 | `/dashboard_employe` |
+| `admin` | admin@narcisse.local | admin | `/admin` |
+| `lina` | lina@narcisse.local | lina | `/dashboard` |
+| `travailleuse2` ou `t2` ou `travailleuse deux` | t2@narcisse.local | t2 | `/dashboard` |
 
-**Un seul dashboard employé** : Lina et Travailleuse 2 voient le même écran ; le contenu dépend du rôle en base.
+**Un seul `/dashboard`** : Lina et Travailleuse 2 partagent l’URL ; le contenu dépend du compte connecté.
 
 ## Auth Supabase
 

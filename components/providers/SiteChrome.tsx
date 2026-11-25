@@ -5,10 +5,14 @@ import type { ReactNode } from "react";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import Cursor from "@/components/ui/Cursor";
 
-/** Espaces de gestion : /dashboard_* (sans Lenis ni curseur éditorial). */
+/** Espaces de gestion : /admin et /dashboard (sans Lenis ni curseur éditorial). */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "";
-  const isDashboard = pathname.startsWith("/dashboard_");
+  const isDashboard =
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/");
 
   if (isDashboard) return <>{children}</>;
 

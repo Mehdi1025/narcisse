@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { dashboardForRole, resolveLoginEmail } from "@/lib/auth/login";
+import { dashboardForRole, normalizeAppPath, resolveLoginEmail } from "@/lib/auth/login";
 import type { SessionRole } from "@/lib/auth/login";
 import { createClient } from "@/lib/supabase/client";
 
@@ -39,7 +39,7 @@ export default function LoginForm() {
       setPending(false);
       return;
     }
-    const dest = next && (next.startsWith("/dashboard_") ? next : null);
+    const dest = normalizeAppPath(next);
     router.replace(dest ?? dashboardForRole(role));
     router.refresh();
   };
