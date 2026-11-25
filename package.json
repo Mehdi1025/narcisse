@@ -9,7 +9,8 @@
     "start": "next start",
     "export": "NEXT_EXPORT=1 next build",
     "typecheck": "tsc --noEmit",
-    "seed:users": "node scripts/seed-dev-users.mjs"
+    "seed:users": "node scripts/seed-dev-users.mjs",
+    "seed:products": "node scripts/seed-products.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",

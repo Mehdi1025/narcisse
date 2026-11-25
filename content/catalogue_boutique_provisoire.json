@@ -1,0 +1,130 @@
+[
+  {
+    "ref": "NAR-SK-01",
+    "univers": "Beauté et skincare",
+    "nom": "Sérum hydratant à l'acide hyaluronique",
+    "description": "Sérum léger qui repulpe et hydrate, pour tous types de peau. Flacon compte-gouttes 30 ml.",
+    "prix": 29,
+    "photo": "photos/NAR-SK-01.jpg"
+  },
+  {
+    "ref": "NAR-SK-02",
+    "univers": "Beauté et skincare",
+    "nom": "Crème visage nourrissante",
+    "description": "Crème riche au fini velouté pour les peaux sèches et sensibles. Pot 50 ml.",
+    "prix": 32,
+    "photo": "photos/NAR-SK-02.jpg"
+  },
+  {
+    "ref": "NAR-SK-03",
+    "univers": "Beauté et skincare",
+    "nom": "Nettoyant doux moussant",
+    "description": "Gel nettoyant au pH doux, première étape du rituel skincare coréen. Tube 150 ml.",
+    "prix": 18,
+    "photo": "photos/NAR-SK-03.jpg"
+  },
+  {
+    "ref": "NAR-SK-04",
+    "univers": "Beauté et skincare",
+    "nom": "Masques en tissu, lot de 5",
+    "description": "Masques hydratants à usage unique pour un soin express à la maison.",
+    "prix": 15,
+    "photo": "photos/NAR-SK-04.jpg"
+  },
+  {
+    "ref": "NAR-SK-05",
+    "univers": "Beauté et skincare",
+    "nom": "Gua sha en quartz rose",
+    "description": "Pierre de massage du visage pour détendre les traits et favoriser l'éclat.",
+    "prix": 24,
+    "photo": "photos/NAR-SK-05.jpg"
+  },
+  {
+    "ref": "NAR-BV-01",
+    "univers": "Bien-être et art de vivre",
+    "nom": "Bougie parfumée en verre",
+    "description": "Cire végétale, notes florales et boisées. Environ 40 h de combustion.",
+    "prix": 26,
+    "photo": "photos/NAR-BV-01.jpg"
+  },
+  {
+    "ref": "NAR-BV-02",
+    "univers": "Bien-être et art de vivre",
+    "nom": "Huile de massage corps",
+    "description": "Huile sèche aux extraits végétaux pour un moment de détente. Flacon 100 ml.",
+    "prix": 22,
+    "photo": "photos/NAR-BV-02.jpg"
+  },
+  {
+    "ref": "NAR-BV-03",
+    "univers": "Bien-être et art de vivre",
+    "nom": "Brume d'oreiller apaisante",
+    "description": "Brume parfumée à vaporiser sur le linge avant le coucher. 75 ml.",
+    "prix": 19,
+    "photo": "photos/NAR-BV-03.jpg"
+  },
+  {
+    "ref": "NAR-BV-04",
+    "univers": "Bien-être et art de vivre",
+    "nom": "Infusion bien-être",
+    "description": "Mélange de plantes à infuser pour une pause douceur. Boîte 80 g.",
+    "prix": 12,
+    "photo": "photos/NAR-BV-04.jpg"
+  },
+  {
+    "ref": "NAR-DP-01",
+    "univers": "Développement personnel",
+    "nom": "Carnet de gratitude",
+    "description": "Carnet ligné à couverture rigide pour noter chaque jour ce qui fait du bien.",
+    "prix": 16,
+    "photo": "photos/NAR-DP-01.jpg"
+  },
+  {
+    "ref": "NAR-DP-02",
+    "univers": "Développement personnel",
+    "nom": "Cartes d'affirmations",
+    "description": "Jeu de 52 cartes positives pour commencer la journée avec intention.",
+    "prix": 19,
+    "photo": "photos/NAR-DP-02.jpg"
+  },
+  {
+    "ref": "NAR-DP-03",
+    "univers": "Développement personnel",
+    "nom": "Journal guidé 30 jours",
+    "description": "Un mois de questions et d'exercices pour mieux se connaître.",
+    "prix": 24,
+    "photo": "photos/NAR-DP-03.jpg"
+  },
+  {
+    "ref": "NAR-DP-04",
+    "univers": "Développement personnel",
+    "nom": "Kit papeterie",
+    "description": "Stylo et trois marque-pages pour accompagner carnets et journaux.",
+    "prix": 14,
+    "photo": "photos/NAR-DP-04.jpg"
+  },
+  {
+    "ref": "NAR-ED-01",
+    "univers": "Éditions exclusives",
+    "nom": "Coffret rituel visage",
+    "description": "Sélection de trois soins en format découverte, présentée en coffret.",
+    "prix": 69,
+    "photo": "photos/NAR-ED-01.jpg"
+  },
+  {
+    "ref": "NAR-ED-02",
+    "univers": "Éditions exclusives",
+    "nom": "Box découverte du mois",
+    "description": "Une sélection de produits bien-être renouvelée chaque mois.",
+    "prix": 39,
+    "photo": "photos/NAR-ED-02.jpg"
+  },
+  {
+    "ref": "NAR-ED-03",
+    "univers": "Éditions exclusives",
+    "nom": "Carte cadeau Narcisse",
+    "description": "À offrir pour un soin, un atelier ou un produit. Montant au choix.",
+    "prix": 30,
+    "photo": "photos/NAR-ED-03.jpg"
+  }
+]
