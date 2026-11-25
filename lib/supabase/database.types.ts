@@ -63,6 +63,7 @@ export type ShopOrderTableRow = {
   total_cents: number;
   currency: string;
   stripe_checkout_session_id: string | null;
+  tracking_token: string;
   paid_at: string | null;
   admin_note: string | null;
   created_at: string;
@@ -156,6 +157,7 @@ export type Database = {
         Row: ShopOrderTableRow;
         Insert: Omit<ShopOrderTableRow, "id" | "created_at" | "updated_at" | "paid_at" | "stripe_checkout_session_id" | "admin_note"> & {
           id?: string;
+          tracking_token?: string;
           created_at?: string;
           updated_at?: string;
           paid_at?: string | null;
@@ -210,6 +212,10 @@ export type Database = {
       complete_shop_order_payment: {
         Args: { p_order_id: string; p_stripe_session_id?: string | null };
         Returns: ShopOrderTableRow;
+      };
+      get_shop_order_by_tracking_token: {
+        Args: { p_token: string };
+        Returns: Record<string, unknown> | null;
       };
       reserve_stock_for_order: {
         Args: { p_order_id: string; p_minutes?: number | null };

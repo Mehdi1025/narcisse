@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { FulfillmentType, ShopOrderStatus } from "@/lib/shop/types";
+import { ORDER_STATUS_LABEL } from "@/lib/shop/orderLabels";
+import { siteOrigin } from "@/lib/shop/config";
 import { formatPrice } from "@/lib/boutique/format";
 import { useToast } from "@/lib/app/store";
 import { Button, Card, Empty, Modal, cx } from "../ui";
@@ -27,18 +29,8 @@ type Order = {
   shipping_postal_code: string | null;
   total_cents: number;
   created_at: string;
+  tracking_token?: string;
   shop_order_lines: OrderLine[];
-};
-
-const STATUS_LABEL: Record<ShopOrderStatus, string> = {
-  pending_payment: "En attente de paiement",
-  paid: "Payée",
-  preparing: "En préparation",
-  ready_pickup: "Prête au retrait",
-  shipped: "Expédiée",
-  delivered: "Livrée",
-  cancelled: "Annulée",
-  refunded: "Remboursée",
 };
 
 export default function ShopOrders() {
@@ -115,7 +107,7 @@ export default function ShopOrders() {
                       {o.customer_name} · {o.fulfillment === "shipping" ? "Livraison" : "Retrait"} · {formatPrice(o.total_cents)}
                     </p>
                   </div>
-                  <span className="text-[12px] text-encre/50">{STATUS_LABEL[o.status] ?? o.status}</span>
+                  <span className="text-[12px] text-encre/50">{ORDER_STATUS_LABEL[o.status] ?? o.status}</span>
                 </button>
               </li>
             ))}
@@ -149,7 +141,20 @@ export default function ShopOrders() {
             ))}
           </ul>
           <p className="mt-4 font-serif text-xl">{formatPrice(detail.total_cents)}</p>
-          <p className="mt-2 text-[12px] text-encre/50">{STATUS_LABEL[detail.status]}</p>
+          <p className="mt-2 text-[12px] text-encre/50">{ORDER_STATUS_LABEL[detail.status]}</p>
+          {detail.tracking_token && (
+            <p className="mt-3 text-[12px] text-encre/55 break-all">
+              Suivi cliente :{" "}
+              <a
+                href={`${siteOrigin().replace(/\/$/, "")}/boutique/suivi/${encodeURIComponent(detail.tracking_token)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-bordeaux underline-offset-2 hover:underline"
+              >
+                ouvrir le lien
+              </a>
+            </p>
+          )}
           <div className="mt-6 flex flex-wrap gap-2">
             {actionFor(detail) && (
               <Button onClick={() => setStatus(detail, actionFor(detail)!.status)}>{actionFor(detail)!.label}</Button>

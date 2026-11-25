@@ -55,8 +55,12 @@ export async function POST(request: Request) {
     mode: "payment",
     customer_email: parsed.customer.email,
     line_items,
-    metadata: { order_id: order.id, order_number: order.order_number },
-    success_url: `${origin}/boutique/merci?commande=${encodeURIComponent(order.order_number)}`,
+    metadata: {
+      order_id: order.id,
+      order_number: order.order_number,
+      tracking_token: order.tracking_token,
+    },
+    success_url: `${origin}/boutique/merci?commande=${encodeURIComponent(order.order_number)}&suivi=${encodeURIComponent(order.tracking_token)}`,
     cancel_url: `${origin}/boutique/commande?annule=1`,
   });
 

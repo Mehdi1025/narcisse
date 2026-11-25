@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { ShopOrderTableRow } from "@/lib/supabase/database.types";
 import type { CheckoutInput } from "@/lib/shop/types";
 import { shippingFlatCents } from "@/lib/shop/config";
+import { newTrackingToken } from "@/lib/shop/trackingToken";
 
 type LineRow = {
   product_id: string;
@@ -63,12 +64,14 @@ export async function createPendingShopOrder(
   }
 
   const order_number = String(orderNumberRow);
+  const tracking_token = newTrackingToken();
   const shipping = input.shipping;
 
   const { data: order, error: orderErr } = await db
     .from("shop_orders")
     .insert({
       order_number,
+      tracking_token,
       status: "pending_payment",
       payment_status: "pending",
       currency: "eur",
