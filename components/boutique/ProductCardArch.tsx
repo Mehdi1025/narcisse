@@ -24,7 +24,7 @@ export default function ProductCardArch({ product, placeholder, href, dataCursor
   const subtitle = product?.tagline ?? placeholder!.items;
   const price = product ? formatPrice(product.price_cents) : null;
   const tag = price ?? (product ? "Collection" : "Bientôt");
-  const linkHref = href ?? (product ? `/boutique/collection#${product.slug}` : undefined);
+  const linkHref = href ?? (product ? `/boutique#selection` : undefined);
   const indexLabel = placeholder ? `05.${placeholder.index + 1}` : undefined;
 
   const inner = (

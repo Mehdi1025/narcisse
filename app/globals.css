@@ -238,3 +238,8 @@ html.js-motion .hero-intro [data-hero-fade] {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Boutique : les marges utilitaires (mt-*, mb-*) priment sur la remise à zéro des éléments. */
+.shop :where(p, h1, h2, h3) {
+  margin: revert-layer;
+}

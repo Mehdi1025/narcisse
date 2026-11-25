@@ -162,7 +162,7 @@ export const nav = [
   { label: "Philosophie", href: "#philosophie" },
   { label: "Les trois pôles", href: "#dimensions" },
   { label: "L'expérience", href: "#experience" },
-  { label: "Boutique", href: "#boutique" },
+  { label: "Boutique", href: "/boutique" },
   { label: "Contact", href: "#contact" },
 ];
 

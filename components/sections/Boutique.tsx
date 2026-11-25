@@ -70,6 +70,11 @@ export default function Boutique({ featured = [] }: { featured?: ProductRow[] })
               {p}
             </p>
           ))}
+          <Magnetic>
+            <Link href={COLLECTION_PATH} className="btn btn-line on-dark !mt-8 inline-flex" data-cursor="Voir">
+              <span className="btn-label">Découvrir la boutique</span>
+            </Link>
+          </Magnetic>
         </div>
       </div>
 
@@ -84,7 +89,7 @@ export default function Boutique({ featured = [] }: { featured?: ProductRow[] })
 
       <div className="mx-auto mt-14 flex justify-center px-[5vw] pb-4">
         <Magnetic>
-          <Link href={COLLECTION_PATH} className="btn btn-line text-ivoire">
+          <Link href={`${COLLECTION_PATH}#selection`} className="btn btn-line text-ivoire">
             <span className="btn-label">Voir toute la collection</span>
           </Link>
         </Magnetic>

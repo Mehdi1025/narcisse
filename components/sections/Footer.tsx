@@ -6,7 +6,8 @@ import { footer } from "@/content/landing";
 import { Symbol, Logotype } from "@/components/brand/Symbol";
 
 /** Pied de page : méandre qui se dessine, colonnes, puis logotype géant qui émerge. */
-export default function Footer() {
+export default function Footer({ base = "" }: { base?: string }) {
+  const link = (h: string) => (h.startsWith("#") ? `${base}${h}` : h);
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -44,7 +45,7 @@ export default function Footer() {
           <ul className="mt-5 space-y-2.5 text-[15.5px]">
             {footer.nav.map((n) => (
               <li key={n.href}>
-                <a href={n.href} className="link-line text-ivoire/85 hover:text-ivoire">
+                <a href={link(n.href)} className="link-line text-ivoire/85 hover:text-ivoire">
                   {n.label}
                 </a>
               </li>
