@@ -26,8 +26,18 @@ function parseInput(body: unknown): WorkshopInput | null {
 export async function GET() {
   const admin = await requireAdmin();
   if (!("error" in admin)) {
+    const { data: rpcData, error: rpcError } = await admin.supabase.rpc("admin_list_workshops");
+    if (!rpcError && rpcData) {
+      return NextResponse.json({ workshops: rpcData });
+    }
+
     const { data, error } = await admin.supabase.from("workshops").select("*").order("starts_at", { ascending: false });
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json(
+        { error: rpcError?.message ?? error.message },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({ workshops: data });
   }
 

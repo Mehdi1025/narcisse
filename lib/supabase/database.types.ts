@@ -120,6 +120,14 @@ export type Database = {
         Args: { p_workshop_id: string; p_full_name: string; p_email: string; p_phone: string | null };
         Returns: Record<string, unknown>;
       };
+      admin_list_workshops: {
+        Args: Record<string, never>;
+        Returns: WorkshopTableRow[];
+      };
+      admin_review_workshop: {
+        Args: { p_workshop_id: string; p_action: string; p_note: string | null };
+        Returns: WorkshopTableRow;
+      };
     };
     Enums: Record<string, never>;
   };

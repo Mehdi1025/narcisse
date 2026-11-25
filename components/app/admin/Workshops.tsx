@@ -40,7 +40,11 @@ export default function AdminWorkshops() {
     load();
   }, [load]);
 
-  const filtered = list.filter((w) => (filter === "all" ? true : w.status === filter));
+  const filtered = list.filter((w) => {
+    if (filter === "all") return true;
+    if (filter === "pending") return w.status === "pending" || w.status === "draft";
+    return w.status === filter;
+  });
 
   const review = async (w: WorkshopRow, action: "publish" | "reject") => {
     const res = await fetch(`/api/admin/workshops/${w.id}/review`, {
@@ -84,7 +88,7 @@ export default function AdminWorkshops() {
     if (detail) openDetail(detail);
   };
 
-  const pending = list.filter((w) => w.status === "pending").length;
+  const pending = list.filter((w) => w.status === "pending" || w.status === "draft").length;
 
   return (
     <div className="space-y-6">
@@ -139,8 +143,11 @@ export default function AdminWorkshops() {
             {detail.location} · fin {new Date(detail.ends_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
           </p>
 
-          {detail.status === "pending" && (
+          {(detail.status === "pending" || detail.status === "draft") && (
             <div className="mt-6 space-y-3">
+              {detail.status === "draft" && (
+                <p className="text-[12.5px] text-bordeaux">Brouillon — Lina ne l&apos;a peut‑être pas encore « envoyé » ; vous pouvez quand même publier.</p>
+              )}
               <label className="block text-[12px] app-label">Note pour l&apos;équipe (optionnel)</label>
               <textarea className="app-input min-h-20" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Motif du refus ou consignes…" />
               <div className="flex flex-wrap gap-2">

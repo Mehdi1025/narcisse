@@ -9,7 +9,11 @@
 
 ## Base Supabase
 
-Exécuter `supabase/migrations/010_workshops.sql` :
+Exécuter dans l’ordre : `010_workshops.sql`, `011_workshops_grants.sql`, `012_admin_workshops_rpc.sql` :
+
+- `010` — schéma
+- `011` — GRANT (corrige permission denied)
+- `012` — RPC validation admin (liste + publier/refuser)
 
 - Tables `workshops`, `workshop_registrations`
 - Statuts atelier : `draft` → `pending` → `published` | `rejected` | `cancelled`

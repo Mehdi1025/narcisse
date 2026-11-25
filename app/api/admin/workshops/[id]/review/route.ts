@@ -18,28 +18,35 @@ export async function POST(request: Request, ctx: Ctx) {
   const action = (json as { action?: string }).action;
   const note = typeof (json as { note?: string }).note === "string" ? (json as { note: string }).note.trim() : null;
 
-  if (action === "publish") {
-    const { data, error } = await auth.supabase
-      .from("workshops")
-      .update({ status: "published", published_at: new Date().toISOString(), admin_note: note })
-      .eq("id", id)
-      .eq("status", "pending")
-      .select("*")
-      .single();
-    if (error || !data) return NextResponse.json({ error: "Publication impossible" }, { status: 400 });
-    return NextResponse.json({ workshop: data });
-  }
+  if (action === "publish" || action === "reject") {
+    const { data, error } = await auth.supabase.rpc("admin_review_workshop", {
+      p_workshop_id: id,
+      p_action: action,
+      p_note: note,
+    });
 
-  if (action === "reject") {
-    const { data, error } = await auth.supabase
+    if (!error && data) {
+      const workshop = Array.isArray(data) ? data[0] : data;
+      if (workshop) return NextResponse.json({ workshop });
+    }
+
+    const { data: fallback, error: fbError } = await auth.supabase
       .from("workshops")
-      .update({ status: "rejected", admin_note: note })
+      .update(
+        action === "publish"
+          ? { status: "published", published_at: new Date().toISOString(), admin_note: note }
+          : { status: "rejected", admin_note: note },
+      )
       .eq("id", id)
-      .eq("status", "pending")
+      .in("status", ["pending", "draft"])
       .select("*")
-      .single();
-    if (error || !data) return NextResponse.json({ error: "Refus impossible" }, { status: 400 });
-    return NextResponse.json({ workshop: data });
+      .maybeSingle();
+
+    if (fbError || !fallback) {
+      const msg = error?.message ?? fbError?.message ?? "Publication impossible — exécutez la migration 012 dans Supabase.";
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
+    return NextResponse.json({ workshop: fallback });
   }
 
   return NextResponse.json({ error: "Action inconnue (publish | reject)" }, { status: 400 });
