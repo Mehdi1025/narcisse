@@ -5,6 +5,7 @@ import { boutique, type ProductKey } from "@/content/landing";
 import { slugify, formatPrice } from "@/lib/boutique/format";
 import { UNIVERSE_LABEL } from "@/lib/boutique/labels";
 import type { ProductRow } from "@/lib/boutique/types";
+import { COLLECTION_PATH } from "@/lib/boutique/labels";
 import { useToast } from "@/lib/app/store";
 import { Button, Card, Empty, Field, Modal, cx } from "../ui";
 
@@ -66,6 +67,7 @@ export default function AdminBoutique() {
   const [modal, setModal] = useState<"create" | ProductRow | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -174,19 +176,49 @@ export default function AdminBoutique() {
     await load();
   };
 
+  const importProvisoire = async () => {
+    if (!window.confirm("Importer ou mettre à jour les 16 produits de la sélection provisoire ?")) return;
+    setImporting(true);
+    try {
+      const res = await fetch("/api/admin/products/import-provisoire", { method: "POST", credentials: "same-origin" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Import impossible");
+      toast(`${json.count ?? 16} produits synchronisés.`);
+      await load();
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const publishedCount = products.filter((p) => p.published).length;
   const featuredCount = products.filter((p) => p.featured && p.published).length;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-[13px] text-encre/55">
-            {publishedCount} publié{publishedCount > 1 ? "s" : ""} · {featuredCount} en vitrine (page d&apos;accueil, max conseillé : 4)
-          </p>
+      <Card eyebrow="E-commerce" title="Gérer la boutique" className="!bg-encre/[0.03]">
+        <p className="text-[13.5px] text-encre/70">
+          Catalogue en ligne : vitrine sur la page d&apos;accueil, collection complète sur le site. Publiez, mettez en avant (4 max conseillés) et modifiez les fiches produits.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button size="sm" variant="ghost" onClick={openCreate}>
+            Ajouter un produit
+          </Button>
+          <Button size="sm" variant="soft" onClick={importProvisoire} disabled={importing}>
+            {importing ? "Import…" : "Importer la sélection provisoire (16)"}
+          </Button>
+          <a href={COLLECTION_PATH} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-full border border-encre/15 px-4 text-[13px] hover:bg-encre/[0.04]">
+            Voir la collection
+          </a>
+          <a href="/#boutique" target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-full border border-encre/15 px-4 text-[13px] hover:bg-encre/[0.04]">
+            Vitrine accueil
+          </a>
         </div>
-        <Button onClick={openCreate}>Ajouter un produit</Button>
-      </div>
+        <p className="mt-4 text-[12px] text-encre/50">
+          {publishedCount} publié{publishedCount > 1 ? "s" : ""} · {featuredCount} en vitrine · photos : /boutique/photos/… ou URL externe
+        </p>
+      </Card>
 
       <Card className="!p-0 overflow-hidden">
         {loading ? (
@@ -200,7 +232,7 @@ export default function AdminBoutique() {
             <table className="w-full min-w-[880px] text-left text-[13px]">
               <thead>
                 <tr className="border-b border-encre/[0.08] text-encre/50">
-                  {["Produit", "Univers", "Prix", "Ordre", "Vitrine", "Publié", ""].map((h) => (
+                  {["", "Produit", "Univers", "Prix", "Ordre", "Vitrine", "Publié", ""].map((h) => (
                     <th key={h} className="px-5 py-3 font-medium app-label">
                       {h}
                     </th>
@@ -210,6 +242,16 @@ export default function AdminBoutique() {
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className="border-b border-encre/[0.05] last:border-0">
+                    <td className="px-3 py-3">
+                      <div className="arch relative h-14 w-11 overflow-hidden rounded-lg bg-encre/5">
+                        {p.image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.image_url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="grid h-full place-items-center text-[9px] text-encre/35">—</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-5 py-3">
                       <button type="button" onClick={() => openEdit(p)} className="text-left hover:text-bordeaux">
                         <span className="font-medium">{p.name}</span>
@@ -271,9 +313,15 @@ export default function AdminBoutique() {
                 <input className="app-input" inputMode="decimal" value={form.priceEuro} onChange={(e) => patchField("priceEuro", e.target.value)} placeholder="39,90" />
               </Field>
             </div>
-            <Field label="Image (URL)" hint="Optionnel — sinon illustration de l'univers.">
-              <input className="app-input" value={form.image_url} onChange={(e) => patchField("image_url", e.target.value)} placeholder="https://…" />
+            <Field label="Image (URL)" hint="Chemin sur le site, ex. /boutique/photos/NAR-SK-01.jpg — ou URL externe.">
+              <input className="app-input" value={form.image_url} onChange={(e) => patchField("image_url", e.target.value)} placeholder="/boutique/photos/NAR-SK-01.jpg" />
             </Field>
+            {form.image_url.trim() && (
+              <div className="arch relative mx-auto aspect-[3/4] w-36 overflow-hidden rounded-2xl border border-encre/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={form.image_url} alt="Aperçu" className="h-full w-full object-cover" />
+              </div>
+            )}
             <Field label="Ordre d'affichage">
               <input className="app-input w-28" type="number" value={form.sort_order} onChange={(e) => patchField("sort_order", e.target.value)} />
             </Field>

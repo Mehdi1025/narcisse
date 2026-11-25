@@ -21,7 +21,7 @@ export const NAV: Record<"admin" | "worker", NavItem[]> = {
     { id: "tasks", label: "Tâches", icon: "tasks", mobile: true },
     { id: "team", label: "Équipe", icon: "team", mobile: true },
     { id: "notifications", label: "Notifications", icon: "bell" },
-    { id: "boutique", label: "Boutique", icon: "bag", soon: true },
+    { id: "boutique", label: "Boutique", icon: "bag" },
     { id: "events", label: "Événements", icon: "spark", soon: true },
     { id: "finances", label: "Finances", icon: "euro", soon: true },
     { id: "settings", label: "Paramètres", icon: "gear", soon: true },
