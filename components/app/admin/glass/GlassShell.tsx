@@ -31,7 +31,7 @@ const VIEWS: Item[] = [
   { id: "team", label: "Équipe", short: "Équipe", icon: Users, description: "Habilitations, compétences et indisponibilités.", hint: "Qui peut réaliser un browlift ?" },
   { id: "notifications", label: "Notifications", short: "Alertes", icon: Bell, description: "Demandes et alertes venant de l'équipe.", hint: "Quoi de neuf dans l'équipe ?" },
   { id: "boutique", label: "Boutique", short: "Boutique", icon: ShoppingBag, description: "Catalogue e-commerce : produits, vitrine et collection.", hint: "Ajouter ou publier un produit…" },
-  { id: "events", label: "Événements", short: "Évén.", icon: Sparkles, description: "Ateliers et inscriptions — module à venir.", hint: "Module à venir", soon: true },
+  { id: "events", label: "Événements", short: "Évén.", icon: Sparkles, description: "Valider les ateliers proposés par l'équipe et suivre les inscriptions.", hint: "Quels ateliers sont à valider ?" },
   { id: "finances", label: "Finances", short: "Finances", icon: Euro, description: "Encaissements et exports — module à venir.", hint: "Module à venir", soon: true },
   { id: "settings", label: "Paramètres", short: "Réglages", icon: Settings, description: "Horaires, prestations et comptes — module à venir.", hint: "Module à venir", soon: true },
 ];

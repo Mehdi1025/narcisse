@@ -22,7 +22,7 @@ export const NAV: Record<"admin" | "worker", NavItem[]> = {
     { id: "team", label: "Équipe", icon: "team", mobile: true },
     { id: "notifications", label: "Notifications", icon: "bell" },
     { id: "boutique", label: "Boutique", icon: "bag" },
-    { id: "events", label: "Événements", icon: "spark", soon: true },
+    { id: "events", label: "Événements", icon: "spark" },
     { id: "finances", label: "Finances", icon: "euro", soon: true },
     { id: "settings", label: "Paramètres", icon: "gear", soon: true },
   ],
@@ -31,6 +31,7 @@ export const NAV: Record<"admin" | "worker", NavItem[]> = {
     { id: "week", label: "Ma semaine", icon: "calendar", mobile: true },
     { id: "tasks", label: "Tâches", icon: "tasks", mobile: true },
     { id: "off", label: "Indisponibilités", icon: "off", mobile: true },
+    { id: "events", label: "Ateliers", icon: "spark", mobile: true },
     { id: "notifications", label: "Notifications", icon: "bell", mobile: true },
   ],
 };
