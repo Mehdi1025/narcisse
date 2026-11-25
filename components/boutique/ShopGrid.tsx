@@ -16,7 +16,13 @@ export default function ShopGrid({ filter, setFilter, open }: { filter: Filter; 
   const indicator = useRef<HTMLSpanElement>(null);
   const flipState = useRef<Flip.FlipState | null>(null);
   const products = useShopCatalog();
-  const { add } = useCart();
+  const { add, setOpen } = useCart();
+
+  const tryAdd = (p: Product) => {
+    if (p.id && p.stockAvailable !== undefined && p.stockAvailable <= 0) return;
+    add(p.ref);
+    setOpen(true);
+  };
   const visible = products.filter((p) => filter === "tout" || p.universe === filter);
   const active = universes.find((u) => u.key === filter);
 
@@ -136,7 +142,8 @@ export default function ShopGrid({ filter, setFilter, open }: { filter: Filter; 
                   <span className="pointer-events-none absolute inset-3 rounded-t-full border border-white/0 transition-[border-color,inset] duration-700 group-hover:inset-4 group-hover:border-white/60" aria-hidden />
                   <button
                     type="button"
-                    onClick={() => add(p.ref)}
+                    onClick={() => tryAdd(p)}
+                    disabled={Boolean(p.id && p.stockAvailable !== undefined && p.stockAvailable <= 0)}
                     className="absolute bottom-4 right-4 grid h-12 w-12 translate-y-3 place-items-center rounded-full bg-papier text-encre opacity-0 shadow-lg transition-all duration-500 hover:bg-bordeaux hover:text-papier focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100"
                     aria-label={`Ajouter ${p.name} au panier`}
                   >

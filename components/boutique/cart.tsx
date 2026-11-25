@@ -52,8 +52,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const add = useCallback(
     (ref: string, qty = 1) => {
       const product = products.find((p) => p.ref === ref);
-      if (!product?.id) return;
-      if (product.stockAvailable !== undefined && product.stockAvailable <= 0) return;
+      if (!product) return;
+      // Produit en ligne (UUID) : respecte le stock ; catalogue démo sans id : panier visuel uniquement
+      if (product.id && product.stockAvailable !== undefined && product.stockAvailable <= 0) return;
       setRaw((l) => {
         const cap = maxQty(product);
         if (cap <= 0) return l;
