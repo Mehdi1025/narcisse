@@ -8,11 +8,13 @@ import Conversion from "@/components/sections/Conversion";
 import Footer from "@/components/sections/Footer";
 import JsonLd from "@/components/sections/JsonLd";
 import Ready from "@/components/providers/Ready";
+import { getFeaturedProducts } from "@/lib/boutique/queries";
 
-// Landing générée statiquement (SSG) : HTML complet et lisible sans JavaScript.
-export const dynamic = "force-static";
+export const revalidate = 60;
 
-export default function Home() {
+export default async function Home() {
+  const featured = await getFeaturedProducts();
+
   return (
     <>
       <Header />
@@ -21,7 +23,7 @@ export default function Home() {
         <Philosophy />
         <Dimensions />
         <Experience />
-        <Boutique />
+        <Boutique featured={featured} />
         <Conversion />
       </main>
       <Footer />

@@ -2,15 +2,20 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP, MQ, revealLines } from "@/lib/gsap";
+import Link from "next/link";
 import { boutique } from "@/content/landing";
-import ProductArt from "@/components/illustrations/ProductArt";
+import ProductCardArch from "@/components/boutique/ProductCardArch";
+import { COLLECTION_PATH } from "@/lib/boutique/labels";
+import type { ProductRow } from "@/lib/boutique/types";
+import Magnetic from "@/components/ui/Magnetic";
 import styles from "./Boutique.module.css";
 
 /**
  * Boutique (futurs univers) : cartes en arche révélées par masque,
  * micro-interactions au survol, puis bandeau défilant réactif à la vitesse de défilement.
  */
-export default function Boutique() {
+export default function Boutique({ featured = [] }: { featured?: ProductRow[] }) {
+  const showProducts = featured.length > 0;
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -68,29 +73,21 @@ export default function Boutique() {
         </div>
       </div>
 
-      <h3 className="sr-only">{boutique.listLabel}</h3>
+      <h3 className="sr-only">{showProducts ? "Sélection de la collection" : boutique.listLabel}</h3>
       <div data-grid className={`${styles.grid} mx-auto mt-[clamp(56px,7vw,100px)] max-w-[1440px] px-[5vw]`}>
-        {boutique.universes.map((u, i) => (
-          <article key={u.key} data-card data-cursor="Bientôt" className={`group ${styles.card}`} tabIndex={0} aria-label={`${u.name} — ${u.items} Bientôt disponible.`}>
-            <div data-card-media className="arch relative aspect-[3/4]">
-              <div data-card-img className={styles.img}>
-                <ProductArt kind={u.key} />
-              </div>
-              <svg className={styles.ring} viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
-                <path pathLength={1} d="M14 400V150A136 136 0 0 1 286 150V400" />
-              </svg>
-              <span className={`eyebrow ${styles.tag}`}>Bientôt</span>
-            </div>
-            <div data-card-meta className="mt-6">
-              <div className="flex items-baseline justify-between gap-4 border-b border-ivoire/15 pb-4">
-                <h4 className="display text-[clamp(26px,2vw,32px)] leading-[1.05]">{u.name}</h4>
-                <span className="eyebrow text-ivoire/40">05.{i + 1}</span>
-              </div>
-              <p className="mt-3 text-[15px] text-ivoire/65">{u.items}</p>
-              <span aria-hidden="true" className={styles.bar} />
-            </div>
-          </article>
-        ))}
+        {showProducts
+          ? featured.map((p) => <ProductCardArch key={p.id} product={p} dataCursor="Découvrir" />)
+          : boutique.universes.map((u, i) => (
+              <ProductCardArch key={u.key} placeholder={{ key: u.key, name: u.name, items: u.items, index: i }} />
+            ))}
+      </div>
+
+      <div className="mx-auto mt-14 flex justify-center px-[5vw] pb-4">
+        <Magnetic>
+          <Link href={COLLECTION_PATH} className="btn btn-line text-ivoire">
+            <span className="btn-label">Voir toute la collection</span>
+          </Link>
+        </Magnetic>
       </div>
 
       {/* Signature en bandeau défilant */}

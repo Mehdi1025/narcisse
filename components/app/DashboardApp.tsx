@@ -9,6 +9,7 @@ import AdminAgenda from "./admin/Agenda";
 import Reservations from "./admin/Reservations";
 import AdminTasks from "./admin/Tasks";
 import Team from "./admin/Team";
+import AdminBoutique from "./admin/Boutique";
 import Soon from "./Soon";
 import Today from "./worker/Today";
 import Week from "./worker/Week";
@@ -74,7 +75,8 @@ export default function DashboardApp({ initialProfile }: { initialProfile: Profi
             {profile === "admin" && view === "reservations" && <Reservations />}
             {profile === "admin" && view === "tasks" && <AdminTasks />}
             {profile === "admin" && view === "team" && <Team />}
-            {profile === "admin" && ["boutique", "events", "finances", "settings"].includes(view) && <Soon view={view} />}
+            {profile === "admin" && view === "boutique" && <AdminBoutique />}
+            {profile === "admin" && ["events", "finances", "settings"].includes(view) && <Soon view={view} />}
             {worker && view === "today" && <Today me={worker} go={go} />}
             {worker && view === "week" && <Week me={worker} />}
             {worker && view === "tasks" && <WorkerTasks me={worker} />}
