@@ -12,6 +12,7 @@ import { clientOf, fmtDay, fmtShort, fmtTime, serviceOf } from "@/lib/app/rules"
 import type { Profile } from "@/lib/app/types";
 import type { ViewId } from "../../Shell";
 import { Modal, cx } from "../../ui";
+import LogoutButton from "../../LogoutButton";
 import Backdrop from "./Backdrop";
 import { formatCount, type CountFormat } from "./charts";
 
@@ -148,6 +149,7 @@ export default function GlassShell({ view, go, children }: { view: ViewId; go: (
               <Bell size={17} strokeWidth={1.75} />
               {unread > 0 && <i className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#96433a] ring-2 ring-[var(--nx-surface)]" />}
             </button>
+            <LogoutButton variant="glass" />
           </div>
         </header>
 

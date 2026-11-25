@@ -4,6 +4,7 @@ import { Logotype, Symbol } from "@/components/brand/Symbol";
 import { useStore, useToast } from "@/lib/app/store";
 import { fmtDay } from "@/lib/app/rules";
 import type { Profile } from "@/lib/app/types";
+import LogoutButton from "./LogoutButton";
 import { Avatar, Icon, cx } from "./ui";
 
 export type ViewId =
@@ -59,11 +60,6 @@ export default function Shell({ profile, view, go, children }: { profile: Profil
     return 0;
   };
 
-  const switchProfile = (p: Profile) => {
-    setMenu(false);
-    go(p === "admin" ? "overview" : "today", p);
-  };
-
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
       {/* ── Barre latérale (ordinateur) */}
@@ -96,7 +92,7 @@ export default function Shell({ profile, view, go, children }: { profile: Profil
               <p className="text-[12px] text-ivoire/50">{me.role}</p>
             </div>
           </div>
-          <ProfileSwitch profile={profile} onChange={switchProfile} dark />
+          <LogoutButton variant="dark" className="mt-3" />
         </div>
       </aside>
 
@@ -122,6 +118,7 @@ export default function Shell({ profile, view, go, children }: { profile: Profil
               <p className="app-label hidden sm:block">{fmtDay(new Date())}</p>
               <h1 className="truncate font-serif text-[24px] leading-tight sm:text-[30px]">{current?.label}</h1>
             </div>
+            <LogoutButton variant="light" className="hidden sm:inline-flex" />
             <button onClick={() => go("notifications")} className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-encre/5" aria-label={`Notifications (${unread} non lues)`}>
               <Icon name="bell" />
               {unread > 0 && <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-bordeaux px-1 text-[10px] font-medium text-papier">{unread}</span>}
@@ -161,8 +158,8 @@ export default function Shell({ profile, view, go, children }: { profile: Profil
         <div className="fixed inset-0 z-[60] lg:hidden">
           <button className="app-fade absolute inset-0 bg-encre/40" onClick={() => setMenu(false)} aria-label="Fermer" />
           <div className="app-rise absolute inset-x-0 bottom-0 rounded-t-3xl bg-encre p-6 text-ivoire">
-            <p className="mb-3 text-[10.5px] tracking-[0.2em] text-ivoire/45 uppercase">Démo · changer de profil</p>
-            <ProfileSwitch profile={profile} onChange={switchProfile} dark list />
+            <p className="mb-3 text-[10.5px] tracking-[0.2em] text-ivoire/45 uppercase">Session</p>
+            <LogoutButton variant="dark" />
           </div>
         </div>
       )}
@@ -189,29 +186,3 @@ function NavButton({ item, active, count = 0, onClick }: { item: NavItem; active
   );
 }
 
-function ProfileSwitch({ profile, onChange, dark, list }: { profile: Profile; onChange: (p: Profile) => void; dark?: boolean; list?: boolean }) {
-  const options: Profile[] = ["admin", "lina", "t2"];
-  return (
-    <div className={cx("mt-3", list ? "grid gap-2" : "")}>
-      {!list && <p className={cx("mb-2 px-2 text-[10.5px] tracking-[0.2em] uppercase", dark ? "text-ivoire/35" : "text-encre/40")}>Démo · voir en tant que</p>}
-      <div className={cx(list ? "grid gap-2" : "grid grid-cols-3 gap-1 rounded-full bg-ivoire/[0.07] p-1")}>
-        {options.map((p) => (
-          <button
-            key={p}
-            onClick={() => onChange(p)}
-            className={cx(
-              list
-                ? "flex items-center gap-3 rounded-2xl px-3 py-3 text-left text-[15px]"
-                : "rounded-full py-1.5 text-[11.5px] transition-colors",
-              p === profile ? (list ? "bg-ivoire/10" : "bg-ivoire text-encre") : "text-ivoire/60 hover:text-ivoire",
-            )}
-            aria-pressed={p === profile}
-          >
-            {list && <Avatar id={p} label={PROFILE_LABEL[p].initials} size={34} />}
-            {list ? PROFILE_LABEL[p].name : p === "admin" ? "Admin" : p === "lina" ? "Lina" : "Trav. 2"}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
