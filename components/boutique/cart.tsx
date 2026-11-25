@@ -9,7 +9,7 @@ type Ctx = {
   count: number;
   total: number;
   canCheckout: boolean;
-  add: (ref: string, qty?: number) => void;
+  add: (ref: string, qty?: number) => boolean;
   setQty: (ref: string, qty: number) => void;
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -17,6 +17,12 @@ type Ctx = {
 };
 const CartCtx = createContext<Ctx | null>(null);
 const KEY = "narcisse-panier";
+
+/** Produit ajoutable au panier (stock ou démo sans UUID). */
+export function canAddProduct(p: Product): boolean {
+  if (p.id && p.stockAvailable !== undefined && p.stockAvailable <= 0) return false;
+  return true;
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const products = useShopCatalog();
@@ -50,19 +56,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const add = useCallback(
-    (ref: string, qty = 1) => {
+    (ref: string, qty = 1): boolean => {
       const product = products.find((p) => p.ref === ref);
-      if (!product) return;
-      // Produit en ligne (UUID) : respecte le stock ; catalogue démo sans id : panier visuel uniquement
-      if (product.id && product.stockAvailable !== undefined && product.stockAvailable <= 0) return;
+      if (!product || !canAddProduct(product)) return false;
+      let ok = false;
       setRaw((l) => {
         const cap = maxQty(product);
         if (cap <= 0) return l;
+        ok = true;
         return l.some((x) => x.ref === ref)
           ? l.map((x) => (x.ref === ref ? { ...x, qty: Math.min(cap, x.qty + qty) } : x))
           : [...l, { ref, qty: Math.min(cap, qty) }];
       });
-      setBump((b) => b + 1);
+      if (ok) setBump((b) => b + 1);
+      return ok;
     },
     [products, maxQty],
   );

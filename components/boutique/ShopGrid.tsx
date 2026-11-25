@@ -4,7 +4,7 @@ import { Flip } from "gsap/Flip";
 import { gsap, ScrollTrigger, useGSAP, MQ, revealLines } from "@/lib/gsap";
 import { euro, universes, type Product, type UniverseKey } from "@/content/boutique";
 import { useShopCatalog } from "./shopCatalog";
-import { useCart } from "./cart";
+import { canAddProduct, useCart } from "./cart";
 
 if (typeof window !== "undefined") gsap.registerPlugin(Flip);
 
@@ -19,8 +19,7 @@ export default function ShopGrid({ filter, setFilter, open }: { filter: Filter; 
   const { add, setOpen } = useCart();
 
   const tryAdd = (p: Product) => {
-    if (p.id && p.stockAvailable !== undefined && p.stockAvailable <= 0) return;
-    add(p.ref);
+    if (!add(p.ref)) return;
     setOpen(true);
   };
   const visible = products.filter((p) => filter === "tout" || p.universe === filter);
@@ -143,7 +142,7 @@ export default function ShopGrid({ filter, setFilter, open }: { filter: Filter; 
                   <button
                     type="button"
                     onClick={() => tryAdd(p)}
-                    disabled={Boolean(p.id && p.stockAvailable !== undefined && p.stockAvailable <= 0)}
+                    disabled={!canAddProduct(p)}
                     className="absolute bottom-4 right-4 grid h-12 w-12 translate-y-3 place-items-center rounded-full bg-papier text-encre opacity-0 shadow-lg transition-all duration-500 hover:bg-bordeaux hover:text-papier focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100"
                     aria-label={`Ajouter ${p.name} au panier`}
                   >

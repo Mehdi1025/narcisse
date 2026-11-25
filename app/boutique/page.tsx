@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const products = await getShopProducts();
-  return <BoutiquePage products={products} />;
+  await getShopProducts();
+  return <BoutiquePage />;
 }

@@ -9,20 +9,14 @@ import { useSmoothScroll } from "@/components/providers/SmoothScroll";
 import Magnetic from "@/components/ui/Magnetic";
 import Footer from "@/components/sections/Footer";
 import Ready from "@/components/providers/Ready";
-import { CartProvider, useCart } from "./cart";
-import { ShopCatalogProvider } from "./shopCatalog";
+import { canAddProduct, useCart } from "./cart";
 import ShopHero from "./ShopHero";
 import ShopGrid from "./ShopGrid";
 import { GiftSpotlight, UniverseIndex } from "./ShopIndex";
 
-export default function BoutiquePage({ products }: { products: import("@/content/boutique").Product[] }) {
-  return (
-    <ShopCatalogProvider products={products}>
-      <CartProvider>
-        <Shop />
-      </CartProvider>
-    </ShopCatalogProvider>
-  );
+/** Catalogue + panier : fournis par `app/boutique/layout.tsx` (un seul provider). */
+export default function BoutiquePage() {
+  return <Shop />;
 }
 
 function Shop() {
@@ -157,6 +151,7 @@ function Panel({ open, close, label, children, wide }: { open: boolean; close: (
 function ProductPanel({ product, close }: { product: Product | null; close: () => void }) {
   const { add, setOpen } = useCart();
   const [qty, setQty] = useState(1);
+  const [addError, setAddError] = useState<string | null>(null);
   const [last, setLast] = useState<Product | null>(product);
   useEffect(() => {
     if (product) {
@@ -190,16 +185,26 @@ function ProductPanel({ product, close }: { product: Product | null; close: () =
               </div>
               <button
                 type="button"
-                className="btn btn-fill flex-1"
+                className="btn btn-fill flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!canAddProduct(p)}
                 onClick={() => {
-                  add(p.ref, qty);
+                  setAddError(null);
+                  if (!add(p.ref, qty)) {
+                    setAddError(
+                      p.id
+                        ? "Produit épuisé — augmentez le stock dans l’admin boutique."
+                        : "Produit indisponible à l’achat en ligne.",
+                    );
+                    return;
+                  }
                   close();
                   setTimeout(() => setOpen(true), 450);
                 }}
               >
-                <span className="btn-label">Ajouter au panier</span>
+                <span className="btn-label">{canAddProduct(p) ? "Ajouter au panier" : "Épuisé"}</span>
               </button>
             </div>
+            {addError && <p className="mt-3 text-[13px] text-bordeaux">{addError}</p>}
             <dl data-in className="mt-auto grid gap-3 border-t border-encre/10 pt-8 text-[13px] text-gris/75">
               <div className="flex justify-between gap-4"><dt>Référence</dt><dd>{p.ref}</dd></div>
               <div className="flex justify-between gap-4"><dt>Paiement</dt><dd>{shop.checkoutNote}</dd></div>
