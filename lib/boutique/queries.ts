@@ -1,10 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
 import { catalogueProvisoireRows } from "@/lib/boutique/catalogueProvisoire";
 import type { ProductRow } from "@/lib/boutique/types";
+import { createPublicClient } from "@/lib/supabase/public";
+
+const PRODUCT_COLUMNS =
+  "id, name, slug, tagline, description, universe, price_cents, image_url, featured, sort_order, stock_on_hand, stock_reserved, stock_alert_threshold" as const;
 
 const PROVISOIRE_IMAGE_BY_SLUG = new Map(
   catalogueProvisoireRows().map((p) => [p.slug, p.image_url] as const),
 );
+
+function allowFallbackCatalogue(): boolean {
+  return process.env.NODE_ENV === "development" || process.env.SHOP_FALLBACK_CATALOGUE === "1";
+}
 
 /** Complète l’URL photo depuis le catalogue provisoire si la base n’en a pas. */
 function withProvisoireImage(row: ProductRow): ProductRow {
@@ -28,29 +35,37 @@ function fallbackPublished(): ProductRow[] {
 }
 
 export async function getFeaturedProducts(limit = 4): Promise<ProductRow[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select(PRODUCT_COLUMNS)
     .eq("published", true)
     .eq("featured", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error || !data?.length) return fallbackFeatured(limit);
+  if (error) {
+    if (allowFallbackCatalogue()) return fallbackFeatured(limit);
+    throw new Error("Catalogue indisponible : " + error.message);
+  }
+  if (!data?.length) return [];
   return mapRows(data as ProductRow[]);
 }
 
 export async function getPublishedProducts(): Promise<ProductRow[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select(PRODUCT_COLUMNS)
     .eq("published", true)
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
 
-  if (error || !data?.length) return fallbackPublished();
+  if (error) {
+    if (allowFallbackCatalogue()) return fallbackPublished();
+    throw new Error("Catalogue indisponible : " + error.message);
+  }
+  if (!data?.length) return [];
   return mapRows(data as ProductRow[]);
 }

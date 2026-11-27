@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { WorkshopRow } from "@/lib/workshops/types";
+import type { PublishedWorkshop } from "@/lib/workshops/types";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import Ready from "@/components/providers/Ready";
 
-export default function AteliersPublic({ workshops }: { workshops: WorkshopRow[] }) {
-  const [sel, setSel] = useState<WorkshopRow | null>(null);
+export default function AteliersPublic({ workshops }: { workshops: PublishedWorkshop[] }) {
+  const [sel, setSel] = useState<PublishedWorkshop | null>(null);
   const [form, setForm] = useState({ full_name: "", email: "", phone: "" });
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);

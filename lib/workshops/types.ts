@@ -1,6 +1,12 @@
 export type WorkshopStatus = "draft" | "pending" | "published" | "rejected" | "cancelled";
 export type RegistrationStatus = "registered" | "waitlist" | "cancelled" | "attended";
 
+/** Champs exposés sur /ateliers (pas de données internes admin). */
+export type PublishedWorkshop = Pick<
+  WorkshopRow,
+  "id" | "title" | "description" | "starts_at" | "ends_at" | "capacity" | "location" | "status"
+>;
+
 export type WorkshopRow = {
   id: string;
   proposed_by: string;
