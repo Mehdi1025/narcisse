@@ -26,6 +26,7 @@ export type ProductTableRow = {
   stock_on_hand?: number;
   stock_reserved?: number;
   stock_alert_threshold?: number;
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -70,6 +71,7 @@ export type ShopOrderTableRow = {
   cgv_version: string | null;
   cgv_accepted_at: string | null;
   confirmation_email_sent_at: string | null;
+  pickup_ready_email_sent_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -151,6 +153,7 @@ export type Database = {
           stock_on_hand?: number;
           stock_reserved?: number;
           stock_alert_threshold?: number;
+          archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -171,6 +174,7 @@ export type Database = {
           | "cgv_version"
           | "cgv_accepted_at"
           | "confirmation_email_sent_at"
+          | "pickup_ready_email_sent_at"
         > & {
           id?: string;
           tracking_token?: string;
@@ -178,6 +182,7 @@ export type Database = {
           cgv_version?: string | null;
           cgv_accepted_at?: string | null;
           confirmation_email_sent_at?: string | null;
+          pickup_ready_email_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
           paid_at?: string | null;
@@ -300,6 +305,14 @@ export type Database = {
       set_product_stock: {
         Args: { p_product_id: string; p_target: number; p_note?: string | null };
         Returns: void;
+      };
+      restore_stock_for_paid_order: {
+        Args: { p_order_id: string; p_note?: string | null };
+        Returns: void;
+      };
+      check_rate_limit: {
+        Args: { p_bucket: string; p_max_hits: number; p_window_seconds?: number };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;
