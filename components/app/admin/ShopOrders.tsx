@@ -32,6 +32,9 @@ type Order = {
   tracking_token?: string;
   stock_issue?: boolean;
   admin_note?: string | null;
+  cgv_version?: string | null;
+  cgv_accepted_at?: string | null;
+  confirmation_email_sent_at?: string | null;
   shop_order_lines: OrderLine[];
 };
 
@@ -59,6 +62,26 @@ export default function ShopOrders() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const resendEmail = async (order: Order) => {
+    const res = await fetch(`/api/admin/orders/${order.id}/resend-confirmation`, {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      toast(json.error ?? "Envoi impossible");
+      return;
+    }
+    toast("E-mail de confirmation renvoyé");
+    await load();
+    if (detail?.id === order.id) {
+      const refreshed = (await fetch("/api/admin/orders", { credentials: "same-origin" }).then((r) => r.json())).orders?.find(
+        (o: Order) => o.id === order.id,
+      );
+      if (refreshed) setDetail(refreshed);
+    }
+  };
 
   const setStatus = async (order: Order, status: ShopOrderStatus) => {
     const res = await fetch(`/api/admin/orders/${order.id}`, {
@@ -170,6 +193,24 @@ export default function ShopOrders() {
           </ul>
           <p className="mt-4 font-serif text-xl">{formatPrice(detail.total_cents)}</p>
           <p className="mt-2 text-[12px] text-encre/50">{ORDER_STATUS_LABEL[detail.status]}</p>
+          {detail.cgv_version && (
+            <p className="mt-2 text-[12px] text-encre/55">
+              CGV acceptées (version {detail.cgv_version}
+              {detail.cgv_accepted_at
+                ? ` — ${new Date(detail.cgv_accepted_at).toLocaleString("fr-FR")}`
+                : ""}
+              )
+            </p>
+          )}
+          {detail.confirmation_email_sent_at ? (
+            <p className="mt-2 text-[12px] text-encre/55">
+              E-mail de confirmation envoyé le {new Date(detail.confirmation_email_sent_at).toLocaleString("fr-FR")}
+            </p>
+          ) : (
+            detail.payment_status === "paid" && (
+              <p className="mt-2 text-[12px] text-encre/55">E-mail de confirmation : pas encore enregistré comme envoyé.</p>
+            )
+          )}
           {detail.tracking_token && (
             <p className="mt-3 text-[12px] text-encre/55 break-all">
               Suivi cliente :{" "}
@@ -186,6 +227,11 @@ export default function ShopOrders() {
           <div className="mt-6 flex flex-wrap gap-2">
             {actionFor(detail) && (
               <Button onClick={() => setStatus(detail, actionFor(detail)!.status)}>{actionFor(detail)!.label}</Button>
+            )}
+            {detail.payment_status === "paid" && (
+              <Button variant="soft" onClick={() => resendEmail(detail)}>
+                Renvoyer l&apos;e-mail
+              </Button>
             )}
             {detail.status !== "cancelled" && detail.payment_status === "paid" && (
               <Button variant="danger" onClick={() => setStatus(detail, "cancelled")}>

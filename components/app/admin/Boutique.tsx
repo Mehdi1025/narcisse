@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import LegalIncompleteBanner from "./LegalIncompleteBanner";
 import ShopOrders from "./ShopOrders";
 import { boutique, type ProductKey } from "@/content/landing";
 import { slugify, formatPrice } from "@/lib/boutique/format";
@@ -221,6 +222,7 @@ export default function AdminBoutique() {
           </TabBtn>
           <TabBtn active>Commandes</TabBtn>
         </div>
+        <LegalIncompleteBanner />
         <ShopOrders />
       </div>
     );

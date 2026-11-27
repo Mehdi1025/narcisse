@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidateShop } from "@/lib/cache/revalidatePublic";
+import { sendOrderConfirmationEmail } from "@/lib/email/sendOrderConfirmation";
 import { getStripe } from "@/lib/stripe/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type Stripe from "stripe";
@@ -56,6 +57,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
       revalidateShop();
+      try {
+        await sendOrderConfirmationEmail(orderId);
+      } catch (e) {
+        console.error("order_confirmation_email", e instanceof Error ? e.message : e);
+      }
     }
   }
 
