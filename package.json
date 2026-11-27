@@ -10,6 +10,7 @@
     "export": "NEXT_EXPORT=1 next build",
     "typecheck": "tsc --noEmit",
     "seed:users": "node scripts/seed-dev-users.mjs",
+    "staff:create": "node scripts/create-staff-user.mjs",
     "seed:products": "node scripts/seed-products.mjs"
   },
   "dependencies": {
