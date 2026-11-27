@@ -183,14 +183,14 @@ export default function AdminBoutique() {
   };
 
   const remove = async (p: ProductRow) => {
-    if (!window.confirm(`Supprimer « ${p.name} » ?`)) return;
+    if (!window.confirm(`Archiver « ${p.name} » ? (le produit disparaît du catalogue, l’historique stock est conservé)`)) return;
     const res = await fetch(`/api/admin/products/${p.id}`, { method: "DELETE", credentials: "same-origin" });
     const json = await res.json();
     if (!res.ok) {
       toast(json.error ?? "Suppression impossible");
       return;
     }
-    toast("Produit supprimé.");
+    toast("Produit archivé.");
     await load();
   };
 

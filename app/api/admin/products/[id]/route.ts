@@ -85,8 +85,14 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   if ("error" in auth) return auth.error;
 
   const { id } = await ctx.params;
-  const { error } = await auth.supabase.from("products").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const { data, error } = await auth.supabase
+    .from("products")
+    .update({ published: false, featured: false, archived_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("id")
+    .single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!data) return NextResponse.json({ error: "Produit introuvable" }, { status: 404 });
   revalidateShop();
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, archived: true });
 }
