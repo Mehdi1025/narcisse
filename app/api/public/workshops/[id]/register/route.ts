@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { revalidateWorkshops } from "@/lib/cache/revalidatePublic";
+import { enforceRateLimit } from "@/lib/rateLimit/check";
 import { createClient } from "@/lib/supabase/server";
 
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, ctx: Ctx) {
+  const rateErr = await enforceRateLimit("workshop_register", 6, request);
+  if (rateErr) return NextResponse.json({ error: rateErr }, { status: 429 });
+
   const { id } = await ctx.params;
   let json: unknown;
   try {

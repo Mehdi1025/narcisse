@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { checkoutBlockedForLive } from "@/lib/legal/stripeMode";
+import { enforceRateLimit } from "@/lib/rateLimit/check";
 import { siteOrigin } from "@/lib/shop/config";
 import { createPendingShopOrder } from "@/lib/shop/createOrder";
 import { getReservationMinutes } from "@/lib/shop/getReservationMinutes";
@@ -18,6 +19,9 @@ async function abortCheckout(orderId: string, note: string) {
 }
 
 export async function POST(request: Request) {
+  const rateErr = await enforceRateLimit("checkout", 8, request);
+  if (rateErr) return NextResponse.json({ error: rateErr }, { status: 429 });
+
   let json: unknown;
   try {
     json = await request.json();
