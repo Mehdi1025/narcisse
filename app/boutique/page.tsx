@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import BoutiquePage from "@/components/boutique/BoutiquePage";
-import { getShopProducts } from "@/lib/boutique/getShopProducts";
 
 export const revalidate = 60;
 
@@ -11,7 +10,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/boutique" },
 };
 
-export default async function Page() {
-  await getShopProducts();
+export default function Page() {
   return <BoutiquePage />;
 }
