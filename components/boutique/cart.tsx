@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import type { Product } from "@/content/boutique";
-import { useShopCatalog } from "./shopCatalog";
+import { useShopCatalog, useShopStockRefresh } from "./shopCatalog";
 
 type Line = { ref: string; qty: number };
 type Ctx = {
@@ -26,9 +27,19 @@ export function canAddProduct(p: Product): boolean {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const products = useShopCatalog();
+  const refreshStock = useShopStockRefresh();
+  const pathname = usePathname();
   const [raw, setRaw] = useState<Line[]>([]);
   const [open, setOpen] = useState(false);
   const [bump, setBump] = useState(0);
+
+  useEffect(() => {
+    if (open) void refreshStock();
+  }, [open, refreshStock]);
+
+  useEffect(() => {
+    if (pathname === "/boutique/commande") void refreshStock();
+  }, [pathname, refreshStock]);
 
   useEffect(() => {
     try {

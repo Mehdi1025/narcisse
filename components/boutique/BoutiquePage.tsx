@@ -240,6 +240,17 @@ function CartPanel() {
                   <div className="flex min-w-0 flex-1 flex-col">
                     <p className="font-serif text-[21px] leading-tight">{l.product.name}</p>
                     <p className="mt-1 text-[13px] text-gris/60">{euro(l.product.price)}</p>
+                    {l.product.stockAvailable !== undefined && (
+                      <p className="mt-1 text-[12px] text-gris/55">
+                        {l.product.stockAvailable <= 0
+                          ? "Épuisé"
+                          : l.product.stockAvailable <= l.qty
+                            ? "Stock insuffisant"
+                            : l.product.stockAvailable <= 5
+                              ? `Plus que ${l.product.stockAvailable}`
+                              : null}
+                      </p>
+                    )}
                     <div className="mt-auto flex items-center justify-between">
                       <div className="flex h-9 items-center rounded-full border border-encre/15 text-[14px]">
                         <button type="button" className="h-full px-3" onClick={() => setQty(l.ref, l.qty - 1)} aria-label="Moins">−</button>
