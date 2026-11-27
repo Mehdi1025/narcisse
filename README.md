@@ -17,8 +17,37 @@ npm run dev        # http://localhost:3000
 | `npm run build` puis `npm start` | Build de production et serveur |
 | `npm run export` | Site 100 % statique dans `out/` (hébergement sans serveur) |
 | `npm run typecheck` | Vérification TypeScript |
+| `npm run seed:users` | Comptes de démo **local** (voir Sécurité) |
+| `npm run staff:create` | Création d’un compte admin ou employée en prod |
 
 Variable d'environnement facultative : `NEXT_PUBLIC_SITE_URL=https://votre-domaine.fr` (URL canonique, sitemap, données structurées).
+
+## Sécurité (audit NAR-AUD-002)
+
+### Réglages manuels Supabase (Dashboard)
+
+1. **Authentication → Providers → Email** : désactiver **Allow new users to sign up** ; activer la **confirmation d’e-mail**.
+2. **Authentication → Passwords** : longueur minimale **12** ; activer la protection contre les mots de passe divulgués (HIBP) si disponible.
+3. Comptes équipe : uniquement via `npm run staff:create` (ou SQL Editor + Auth Admin API), jamais via inscription publique.
+4. Appliquer la migration `supabase/migrations/021_security_hardening.sql` sur chaque environnement.
+5. Après migration : **changer les mots de passe** de tous les comptes existants (démo `password` interdit en prod).
+
+### Développement local
+
+- `DEMO_PASSWORD` dans `.env.local` (≥ 12 caractères) pour `npm run seed:users`.
+- `NEXT_PUBLIC_SITE_URL` doit contenir `localhost`, ou définir `ALLOW_DEMO_SEED=1` pour une base distante de test.
+
+### SQL / nouvelles fonctions
+
+Toute nouvelle fonction `SECURITY DEFINER` : `REVOKE EXECUTE … FROM PUBLIC, anon, authenticated` puis `GRANT` explicite au rôle nécessaire ; contrôle `is_admin()` pour l’administration.
+
+### Contrôle mensuel
+
+```sql
+select username, role, worker_id, created_at from public.profiles order by created_at;
+```
+
+Vérifier qu’aucun profil inattendu ni élévation de rôle n’apparaît.
 
 ## Concept
 

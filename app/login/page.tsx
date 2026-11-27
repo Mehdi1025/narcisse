@@ -14,9 +14,6 @@ export default function LoginPage() {
         <Suspense fallback={<p className="mt-8 text-sm text-encre/50">Chargement…</p>}>
           <LoginForm />
         </Suspense>
-        <p className="mt-6 text-center text-xs text-encre/45">
-          Démo : <strong>admin</strong>, <strong>lina</strong> ou <strong>travailleuse2</strong> — mot de passe <strong>password</strong>
-        </p>
       </div>
     </main>
   );

@@ -20,14 +20,14 @@ export default function LoginForm() {
     setError(null);
     const email = resolveLoginEmail(username);
     if (!email) {
-      setError("Identifiant inconnu. Utilisez admin, lina ou travailleuse2.");
+      setError("Identifiant ou mot de passe incorrect.");
       return;
     }
     setPending(true);
     const supabase = createClient();
     const { data, error: signError } = await supabase.auth.signInWithPassword({ email, password });
     if (signError) {
-      setError(signError.message === "Invalid login credentials" ? "Identifiant ou mot de passe incorrect." : signError.message);
+      setError("Identifiant ou mot de passe incorrect.");
       setPending(false);
       return;
     }
