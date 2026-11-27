@@ -1,12 +1,14 @@
+import { legalOperator } from "@/content/legal";
+import { completer } from "@/lib/legal/completer";
 import { shippingEnabled } from "@/lib/shop/defaults";
 
-/** Adresse de retrait affichée au checkout — champs à renseigner (shop_settings). */
+/** Adresse de retrait affichée au checkout (alignée sur les données légales). */
 export const PICKUP_LOCATION = {
-  name: "Narcisse",
-  line1: "À renseigner — adresse du salon",
+  name: legalOperator.brandName,
+  line1: completer(legalOperator.registeredAddress),
   line2: "Retrait sur place après e-mail « commande prête »",
-  city: "—",
-  postalCode: "—",
+  city: "",
+  postalCode: "",
 };
 
 export { shippingEnabled };

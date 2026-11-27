@@ -48,7 +48,7 @@ export const shop = {
   titleA: "L'art de prendre soin de soi,",
   titleB: "jusque chez soi.",
   intro: "Des essentiels pour la beauté, le bien-être et le développement personnel, choisis dans le prolongement de notre philosophie.",
-  checkoutNote: "Paiement sécurisé par carte — retrait sur place au salon.",
+  checkoutNote: "Prix en euros TTC · Paiement sécurisé par carte · Retrait gratuit au salon.",
   imageNote: "Visuel d'illustration — la photo du produit arrive bientôt.",
 };
 

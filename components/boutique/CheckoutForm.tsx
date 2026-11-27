@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { euro, shop } from "@/content/boutique";
+import { legalLinks, legalOperator, shopLegalFacts } from "@/content/legal";
+import { completer } from "@/lib/legal/completer";
 import { PICKUP_LOCATION, shippingEnabled, shippingFlatCents } from "@/lib/shop/config";
 import { useCart } from "./cart";
 
@@ -21,6 +23,7 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
   const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [acceptLegal, setAcceptLegal] = useState(false);
 
   const grandTotal = useMemo(() => total + (fulfillment === "shipping" ? shippingEuro : 0), [total, fulfillment]);
 
@@ -40,6 +43,10 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
       setError("Le catalogue en ligne n’est pas encore synchronisé. Réessayez plus tard ou contactez le salon.");
       return;
     }
+    if (!acceptLegal) {
+      setError("Veuillez accepter les CGV et la politique de confidentialité.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -54,6 +61,7 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
               ? { line1, line2, postalCode, city, country: "FR" }
               : undefined,
           lines: lines.map((l) => ({ productId: l.product.id, quantity: l.qty })),
+          acceptLegal: true,
         }),
       });
       const json = await res.json();
@@ -88,7 +96,10 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
               <input type="radio" name="fulfillment" checked={fulfillment === "pickup"} onChange={() => setFulfillment("pickup")} />
               <span>
                 <strong className="block text-[15px]">Retrait au salon</strong>
-                <span className="text-[13px] text-encre/55">{PICKUP_LOCATION.name} — gratuit, notification quand c&apos;est prêt</span>
+                <span className="text-[13px] text-encre/55">
+                  {PICKUP_LOCATION.line1} — {shopLegalFacts.pickupFee.toLowerCase()}, e-mail quand c&apos;est prêt (conservation{" "}
+                  {shopLegalFacts.pickupRetentionDays} jours)
+                </span>
               </span>
             </label>
             {shippingOn && (
@@ -134,16 +145,40 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
             </p>
           )}
           <p className="mt-4 flex justify-between border-t border-encre/10 pt-4 font-serif text-2xl">
-            <span>Total</span>
+            <span>Total TTC</span>
             <span>{euro(grandTotal)}</span>
           </p>
+          <p className="mt-1 text-[12px] text-encre/50">Montants en euros, toutes taxes comprises.</p>
           {!canCheckout && (
             <p className="mt-4 text-[13px] text-bordeaux">Importez le catalogue dans Supabase et renseignez les stocks pour commander en ligne.</p>
           )}
+          <label className="mt-6 flex cursor-pointer gap-3 text-left text-[13px] leading-snug text-encre/75">
+            <input
+              type="checkbox"
+              className="mt-1 shrink-0"
+              checked={acceptLegal}
+              onChange={(e) => setAcceptLegal(e.target.checked)}
+            />
+            <span>
+              J&apos;ai lu et j&apos;accepte les{" "}
+              <Link href={legalLinks.cgv} className="link-line text-bordeaux" target="_blank" rel="noopener noreferrer">
+                conditions générales de vente
+              </Link>{" "}
+              et la{" "}
+              <Link href={legalLinks.privacy} className="link-line text-bordeaux" target="_blank" rel="noopener noreferrer">
+                politique de confidentialité
+              </Link>
+              . Commande sans création de compte.
+            </span>
+          </label>
+          <p className="mt-3 text-[12px] text-encre/50">
+            Droit de rétractation de {shopLegalFacts.withdrawalDays} jours (sauf exceptions légales, notamment produits d&apos;hygiène
+            descellés). Contact : {completer(legalOperator.contactEmail)}.
+          </p>
           {error && <p className="mt-4 text-[13px] text-bordeaux">{error}</p>}
           <button
             type="button"
-            disabled={loading || !name.trim() || !email.trim() || !canCheckout}
+            disabled={loading || !name.trim() || !email.trim() || !canCheckout || !acceptLegal}
             onClick={pay}
             className="btn btn-fill mt-6 w-full disabled:opacity-50"
           >

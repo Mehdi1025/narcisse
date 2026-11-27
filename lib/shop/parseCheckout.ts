@@ -40,6 +40,7 @@ const checkoutSchema = z
     customer: customerSchema,
     lines: z.array(lineSchema).min(1, "Panier vide"),
     shipping: shippingSchema.optional(),
+    acceptLegal: z.literal(true, { error: "Vous devez accepter les CGV et la politique de confidentialité" }),
   })
   .superRefine((data, ctx) => {
     if (data.fulfillment === "shipping") {
