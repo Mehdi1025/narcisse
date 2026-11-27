@@ -296,4 +296,4 @@ grant execute on function public.release_stock_reservation_for_order(uuid, text)
 grant execute on function public.release_expired_stock_reservations() to service_role;
 grant execute on function public.generate_shop_order_number() to service_role;
 
--- pg_cron (à activer côté Supabase) : select cron.schedule('release-stock', '*/5 * * * *', $$ select public.release_expired_stock_reservations(); $$);
+-- pg_cron : voir migration 020_pg_cron_release_stock.sql

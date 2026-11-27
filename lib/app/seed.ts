@@ -19,7 +19,7 @@ export const SERVICES: Service[] = [
 export const SKILLS = ["Accueil", "Boutique", "Hygiène et matériel", "Communication", "Événements", "Administratif"];
 
 const WORKERS: Worker[] = [
-  { id: "lina", name: "Lina", initials: "L", days: [1, 2, 3, 4, 5, 6], hours: { start: 9, end: 18 }, services: ["visage", "skincare", "extensions", "rehaussement", "browlift"], skills: ["Accueil", "Communication", "Événements"] },
+  { id: "lina", name: "Lina", initials: "L", days: [1, 2, 3, 4, 5, 6], hours: { start: 9, end: 18 }, services: ["visage", "skincare", "extensions", "rehaussement", "browlift"], skills: ["Accueil", "Boutique", "Communication", "Événements"] },
   { id: "t2", name: "Travailleuse 2", initials: "T2", days: [1, 2, 3, 4, 5, 6], hours: { start: 10, end: 19 }, services: ["onglerie", "browlift", "rehaussement", "visage"], skills: ["Accueil", "Boutique", "Hygiène et matériel"] },
 ];
 

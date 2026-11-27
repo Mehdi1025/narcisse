@@ -9,7 +9,7 @@ import { Avatar, Icon, cx } from "./ui";
 
 export type ViewId =
   | "overview" | "agenda" | "reservations" | "tasks" | "team" | "boutique" | "events" | "finances" | "settings"
-  | "today" | "week" | "off" | "notifications";
+  | "today" | "week" | "off" | "shop" | "notifications";
 
 type NavItem = { id: ViewId; label: string; icon: string; soon?: boolean; mobile?: boolean };
 
@@ -32,6 +32,7 @@ export const NAV: Record<"admin" | "worker", NavItem[]> = {
     { id: "tasks", label: "Tâches", icon: "tasks", mobile: true },
     { id: "off", label: "Indisponibilités", icon: "off", mobile: true },
     { id: "events", label: "Ateliers", icon: "spark", mobile: true },
+    { id: "shop", label: "Boutique", icon: "bag", mobile: true },
     { id: "notifications", label: "Notifications", icon: "bell", mobile: true },
   ],
 };

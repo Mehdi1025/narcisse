@@ -17,6 +17,7 @@ import Today from "./worker/Today";
 import Week from "./worker/Week";
 import WorkerTasks from "./worker/Tasks";
 import Unavailability from "./worker/Unavailability";
+import WorkerShopOrders from "./worker/ShopOrders";
 import Notifications from "./Notifications";
 
 /** Lit la vue dans l'ancre « #profil/vue » ; le profil reste celui du compte connecté (/dashboard). */
@@ -85,6 +86,7 @@ export default function DashboardApp({ initialProfile }: { initialProfile: Profi
             {worker && view === "week" && <Week me={worker} />}
             {worker && view === "tasks" && <WorkerTasks me={worker} />}
             {worker && view === "off" && <Unavailability me={worker} />}
+            {worker && view === "shop" && <WorkerShopOrders />}
             {view === "notifications" && <Notifications me={profile} />}
           </div>
         </Frame>

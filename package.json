@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "seed:users": "node scripts/seed-dev-users.mjs",
     "staff:create": "node scripts/create-staff-user.mjs",
+    "passwords:demo": "node scripts/set-demo-passwords.mjs",
     "seed:products": "node scripts/seed-products.mjs"
   },
   "dependencies": {

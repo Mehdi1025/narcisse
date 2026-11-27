@@ -237,6 +237,22 @@ export type Database = {
         Args: { p_product_id: string; p_delta: number; p_reason: string; p_note?: string | null };
         Returns: void;
       };
+      has_boutique_skill: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      employee_list_shop_orders: {
+        Args: Record<string, never>;
+        Returns: ShopOrderTableRow[];
+      };
+      employee_transition_shop_order: {
+        Args: { p_order_id: string; p_status: ShopOrderStatus; p_confirm_name?: string | null };
+        Returns: ShopOrderTableRow;
+      };
+      employee_pickup_by_order_number: {
+        Args: { p_order_number: string; p_confirm_name: string };
+        Returns: ShopOrderTableRow;
+      };
     };
     Enums: Record<string, never>;
   };
