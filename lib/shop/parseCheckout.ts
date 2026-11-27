@@ -4,8 +4,21 @@ import type { CheckoutInput } from "@/lib/shop/types";
 
 const lineSchema = z.object({
   productId: z.string().uuid(),
-  quantity: z.number().int().min(1).max(99),
+  quantity: z.number().int().min(1).max(9),
 });
+
+function mergeCheckoutLines(lines: { productId: string; quantity: number }[]): { productId: string; quantity: number }[] | { error: string } {
+  const map = new Map<string, number>();
+  for (const l of lines) {
+    map.set(l.productId, (map.get(l.productId) ?? 0) + l.quantity);
+  }
+  const merged = [...map.entries()].map(([productId, quantity]) => ({ productId, quantity }));
+  if (merged.length > 30) return { error: "Maximum 30 références différentes par commande" };
+  for (const m of merged) {
+    if (m.quantity > 9) return { error: "Quantité maximale : 9 par produit" };
+  }
+  return merged;
+}
 
 const customerSchema = z.object({
   name: z.string().trim().min(2, "Nom invalide"),
@@ -47,9 +60,11 @@ export function parseCheckoutBody(body: unknown): CheckoutInput | { error: strin
     return { error: msg };
   }
   const o = parsed.data;
+  const merged = mergeCheckoutLines(o.lines);
+  if ("error" in merged) return { error: merged.error };
 
   return {
-    lines: o.lines,
+    lines: merged,
     fulfillment: o.fulfillment,
     customer: { name: o.customer.name, email: o.customer.email, phone: o.customer.phone },
     shipping:

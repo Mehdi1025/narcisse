@@ -2,9 +2,19 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { siteOrigin } from "@/lib/shop/config";
 import { createPendingShopOrder } from "@/lib/shop/createOrder";
+import { getReservationMinutes } from "@/lib/shop/getReservationMinutes";
 import { parseCheckoutBody } from "@/lib/shop/parseCheckout";
 import { getStripe } from "@/lib/stripe/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+async function abortCheckout(orderId: string, note: string) {
+  const db = createAdminClient();
+  await db.rpc("release_stock_reservation_for_order", { p_order_id: orderId, p_note: note });
+  await db
+    .from("shop_orders")
+    .update({ status: "cancelled", payment_status: "failed" })
+    .eq("id", orderId);
+}
 
 export async function POST(request: Request) {
   let json: unknown;
@@ -30,6 +40,8 @@ export async function POST(request: Request) {
 
   const { order, lines } = created;
   const origin = siteOrigin().replace(/\/$/, "");
+  const reservationMinutes = await getReservationMinutes();
+  const sessionTtlSec = Math.max(30, reservationMinutes - 4) * 60;
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = lines.map((l) => ({
     quantity: l.quantity,
@@ -51,23 +63,33 @@ export async function POST(request: Request) {
     });
   }
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: parsed.customer.email,
-    line_items,
-    metadata: {
-      order_id: order.id,
-      order_number: order.order_number,
-      tracking_token: order.tracking_token,
-    },
-    success_url: `${origin}/boutique/merci?commande=${encodeURIComponent(order.order_number)}&suivi=${encodeURIComponent(order.tracking_token)}`,
-    cancel_url: `${origin}/boutique/commande?annule=1`,
-  });
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer_email: parsed.customer.email,
+      line_items,
+      expires_at: Math.floor(Date.now() / 1000) + sessionTtlSec,
+      metadata: {
+        order_id: order.id,
+        order_number: order.order_number,
+        tracking_token: order.tracking_token,
+      },
+      success_url: `${origin}/boutique/merci?commande=${encodeURIComponent(order.order_number)}&suivi=${encodeURIComponent(order.tracking_token)}`,
+      cancel_url: `${origin}/boutique/commande?annule=1`,
+    });
+  } catch {
+    await abortCheckout(order.id, "Échec création session Stripe");
+    return NextResponse.json({ error: "Paiement momentanément indisponible, réessayez." }, { status: 502 });
+  }
+
+  if (!session.url) {
+    await abortCheckout(order.id, "Session Stripe sans URL");
+    return NextResponse.json({ error: "Paiement momentanément indisponible, réessayez." }, { status: 502 });
+  }
 
   const db = createAdminClient();
   await db.from("shop_orders").update({ stripe_checkout_session_id: session.id }).eq("id", order.id);
-
-  if (!session.url) return NextResponse.json({ error: "Session Stripe invalide" }, { status: 500 });
 
   return NextResponse.json({ checkoutUrl: session.url, orderNumber: order.order_number });
 }

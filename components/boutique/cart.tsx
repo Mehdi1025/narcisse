@@ -33,7 +33,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const v = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-      if (Array.isArray(v)) setRaw(v.filter((l) => products.some((p) => p.ref === l.ref)));
+      if (!Array.isArray(v)) return;
+      const merged = new Map<string, number>();
+      for (const item of v) {
+        if (!item || typeof item.ref !== "string") continue;
+        if (!products.some((p) => p.ref === item.ref)) continue;
+        const qty = Math.min(9, Math.max(1, Number(item.qty) || 1));
+        merged.set(item.ref, Math.min(9, (merged.get(item.ref) ?? 0) + qty));
+      }
+      setRaw([...merged.entries()].map(([ref, qty]) => ({ ref, qty })));
     } catch {
       /* ignore */
     }
