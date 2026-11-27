@@ -21,6 +21,11 @@ export type PublicOrderTracking = {
   currency: string;
   paid_at: string | null;
   created_at: string;
+  shipping_line1: string | null;
+  shipping_line2: string | null;
+  shipping_postal_code: string | null;
+  shipping_city: string | null;
+  shipping_country: string | null;
   lines: PublicOrderLine[];
 };
 
@@ -59,6 +64,11 @@ export async function getOrderByTrackingToken(token: string): Promise<PublicOrde
     currency: String(o.currency ?? "eur"),
     paid_at: typeof o.paid_at === "string" ? o.paid_at : null,
     created_at: String(o.created_at ?? ""),
+    shipping_line1: typeof o.shipping_line1 === "string" ? o.shipping_line1 : null,
+    shipping_line2: typeof o.shipping_line2 === "string" ? o.shipping_line2 : null,
+    shipping_postal_code: typeof o.shipping_postal_code === "string" ? o.shipping_postal_code : null,
+    shipping_city: typeof o.shipping_city === "string" ? o.shipping_city : null,
+    shipping_country: typeof o.shipping_country === "string" ? o.shipping_country : null,
     lines,
   };
 }

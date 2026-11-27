@@ -35,6 +35,7 @@ type Order = {
   cgv_version?: string | null;
   cgv_accepted_at?: string | null;
   confirmation_email_sent_at?: string | null;
+  shipped_email_sent_at?: string | null;
   shop_order_lines: OrderLine[];
 };
 
@@ -44,6 +45,7 @@ export default function ShopOrders() {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<Order | null>(null);
   const [stockOnly, setStockOnly] = useState(false);
+  const [shippingNote, setShippingNote] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,12 +85,12 @@ export default function ShopOrders() {
     }
   };
 
-  const setStatus = async (order: Order, status: ShopOrderStatus) => {
+  const setStatus = async (order: Order, status: ShopOrderStatus, adminNote?: string) => {
     const res = await fetch(`/api/admin/orders/${order.id}`, {
       method: "PATCH",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, ...(adminNote?.trim() ? { admin_note: adminNote.trim() } : {}) }),
     });
     const json = await res.json();
     if (!res.ok) {
@@ -97,6 +99,7 @@ export default function ShopOrders() {
     }
     toast("Commande mise à jour");
     setDetail(json.order as Order);
+    if (status === "shipped") setShippingNote("");
     await load();
   };
 
@@ -144,7 +147,14 @@ export default function ShopOrders() {
           <ul className="divide-y divide-encre/[0.06]">
             {shown.map((o) => (
               <li key={o.id}>
-                <button type="button" onClick={() => setDetail(o)} className="flex w-full flex-wrap items-center justify-between gap-4 p-5 text-left hover:bg-encre/[0.02]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDetail(o);
+                    setShippingNote(o.admin_note ?? "");
+                  }}
+                  className="flex w-full flex-wrap items-center justify-between gap-4 p-5 text-left hover:bg-encre/[0.02]"
+                >
                   <div>
                     <p className="font-medium">
                       {o.order_number}
@@ -211,6 +221,11 @@ export default function ShopOrders() {
               <p className="mt-2 text-[12px] text-encre/55">E-mail de confirmation : pas encore enregistré comme envoyé.</p>
             )
           )}
+          {detail.fulfillment === "shipping" && detail.shipped_email_sent_at && (
+            <p className="mt-2 text-[12px] text-encre/55">
+              E-mail d&apos;expédition envoyé le {new Date(detail.shipped_email_sent_at).toLocaleString("fr-FR")}
+            </p>
+          )}
           {detail.tracking_token && (
             <p className="mt-3 text-[12px] text-encre/55 break-all">
               Suivi cliente :{" "}
@@ -224,9 +239,27 @@ export default function ShopOrders() {
               </a>
             </p>
           )}
+          {detail.fulfillment === "shipping" && detail.status === "preparing" && actionFor(detail)?.status === "shipped" && (
+            <label className="mt-4 flex flex-col gap-1 text-[12px] text-encre/55">
+              Note expédition (optionnel — lien transporteur, affichée dans l&apos;e-mail)
+              <input
+                value={shippingNote}
+                onChange={(e) => setShippingNote(e.target.value)}
+                placeholder="Ex. Colissimo — suivi 8X…"
+                className="h-11 rounded-xl border border-encre/10 bg-papier px-3 text-[14px] text-encre"
+              />
+            </label>
+          )}
           <div className="mt-6 flex flex-wrap gap-2">
             {actionFor(detail) && (
-              <Button onClick={() => setStatus(detail, actionFor(detail)!.status)}>{actionFor(detail)!.label}</Button>
+              <Button
+                onClick={() => {
+                  const next = actionFor(detail)!.status;
+                  setStatus(detail, next, next === "shipped" ? shippingNote : undefined);
+                }}
+              >
+                {actionFor(detail)!.label}
+              </Button>
             )}
             {detail.payment_status === "paid" && (
               <Button variant="soft" onClick={() => resendEmail(detail)}>

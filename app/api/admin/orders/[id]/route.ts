@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { maybeSendReadyPickupOnTransition } from "@/lib/email/sendOrderReadyPickup";
+import { maybeSendShippedOnTransition } from "@/lib/email/sendOrderShipped";
 import { processOrderCancellation } from "@/lib/shop/cancelPaidOrder";
 import type { ShopOrderStatus } from "@/lib/shop/types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -58,6 +59,9 @@ export async function PATCH(request: Request, ctx: Ctx) {
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
     if (body.status === "ready_pickup") {
       await maybeSendReadyPickupOnTransition(id, prev, body.status);
+    }
+    if (body.status === "shipped") {
+      await maybeSendShippedOnTransition(id, prev, body.status);
     }
     return NextResponse.json({ order: data });
   }

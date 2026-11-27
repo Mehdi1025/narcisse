@@ -30,6 +30,31 @@ export function buildOrderConfirmationEmail(
 
   const linesText = lines.map((l) => `- ${l.product_name} × ${l.quantity} : ${euro(l.line_total_cents)}`).join("\n");
 
+  const isShipping = order.fulfillment === "shipping";
+  const shipAddr = [order.shipping_line1, order.shipping_line2, [order.shipping_postal_code, order.shipping_city].filter(Boolean).join(" ")]
+    .filter(Boolean)
+    .join("<br/>");
+
+  const fulfillmentHtml = isShipping
+    ? `<h2 style="margin:24px 0 8px;font-family:Georgia,serif;font-size:18px;">Livraison</h2>
+<p style="margin:0;font-size:14px;line-height:1.55;">Forfait livraison : ${euro(order.shipping_cost_cents)}<br/>
+Adresse : ${shipAddr}<br/>
+Préparation : ${legalField(LEGAL.lieu.delaiPreparation)} — vous recevrez un e-mail lorsque le colis sera expédié.</p>`
+    : `<h2 style="margin:24px 0 8px;font-family:Georgia,serif;font-size:18px;">Retrait sur place</h2>
+<p style="margin:0;font-size:14px;line-height:1.55;">Adresse : ${legalField(LEGAL.lieu.adresseRetrait)}<br/>
+Horaires : ${legalField(LEGAL.lieu.horairesRetrait)}<br/>
+Préparation : ${legalField(LEGAL.lieu.delaiPreparation)}<br/>
+Conservation : ${LEGAL.conservationRetraitJours} jours après l'e-mail « commande prête ».</p>`;
+
+  const fulfillmentText = isShipping
+    ? `Livraison — forfait ${euro(order.shipping_cost_cents)}
+Adresse : ${[order.shipping_line1, order.shipping_line2, [order.shipping_postal_code, order.shipping_city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}
+Préparation : ${legalField(LEGAL.lieu.delaiPreparation)} — e-mail à l'expédition.`
+    : `Retrait : ${legalField(LEGAL.lieu.adresseRetrait)}
+Horaires : ${legalField(LEGAL.lieu.horairesRetrait)}
+Préparation : ${legalField(LEGAL.lieu.delaiPreparation)}
+Conservation : ${LEGAL.conservationRetraitJours} jours après e-mail « commande prête ».`;
+
   const html = `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#f7f4ef;font-family:Jost,Arial,sans-serif;color:#2e3b57;">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:24px auto;background:#fff;border:1px solid #e8e4df;border-radius:16px;">
 <tr><td style="padding:28px 24px;">
@@ -39,11 +64,7 @@ export function buildOrderConfirmationEmail(
 <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">${lineRows}</table>
 <p style="margin:16px 0 0;font-size:16px;font-family:Georgia,serif;"><strong>Total TTC : ${euro(order.total_cents)}</strong></p>
 <p style="margin:8px 0 0;font-size:12px;color:#5a6270;">${tvaPriceMention()}</p>
-<h2 style="margin:24px 0 8px;font-family:Georgia,serif;font-size:18px;">Retrait sur place</h2>
-<p style="margin:0;font-size:14px;line-height:1.55;">Adresse : ${legalField(LEGAL.lieu.adresseRetrait)}<br/>
-Horaires : ${legalField(LEGAL.lieu.horairesRetrait)}<br/>
-Préparation : ${legalField(LEGAL.lieu.delaiPreparation)}<br/>
-Conservation : ${LEGAL.conservationRetraitJours} jours après l'e-mail « commande prête ».</p>
+${fulfillmentHtml}
 <p style="margin:16px 0 0;"><a href="${trackingUrl}" style="display:inline-block;padding:12px 20px;background:#2e3b57;color:#f7f4ef;text-decoration:none;border-radius:999px;font-size:13px;">Suivre ma commande</a></p>
 <h2 style="margin:24px 0 8px;font-family:Georgia,serif;font-size:18px;">Vendeur</h2>
 <p style="margin:0;font-size:14px;line-height:1.55;">${legalField(LEGAL.exploitant.raisonSociale)} — ${legalField(LEGAL.exploitant.email)} — ${legalField(LEGAL.exploitant.telephone)}</p>
@@ -62,10 +83,7 @@ ${linesText}
 Total TTC : ${euro(order.total_cents)}
 ${tvaPriceMention()}
 
-Retrait : ${legalField(LEGAL.lieu.adresseRetrait)}
-Horaires : ${legalField(LEGAL.lieu.horairesRetrait)}
-Préparation : ${legalField(LEGAL.lieu.delaiPreparation)}
-Conservation : ${LEGAL.conservationRetraitJours} jours après e-mail « commande prête ».
+${fulfillmentText}
 
 Suivi : ${trackingUrl}
 

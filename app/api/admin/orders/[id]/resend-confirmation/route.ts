@@ -11,10 +11,8 @@ export async function POST(_request: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const result = await sendOrderConfirmationEmail(id, { force: true });
   if (!result.sent) {
-    return NextResponse.json(
-      { error: "E-mail non envoyé (vérifier RESEND_API_KEY, EMAIL_FROM, ou statut de paiement)." },
-      { status: 400 },
-    );
+    const detail = result.reason ?? "Vérifier RESEND_API_KEY, EMAIL_FROM (Production Vercel), puis redéployer.";
+    return NextResponse.json({ error: `E-mail non envoyé : ${detail}` }, { status: 400 });
   }
   return NextResponse.json({ ok: true });
 }

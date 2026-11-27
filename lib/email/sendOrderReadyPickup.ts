@@ -7,6 +7,7 @@ export async function sendOrderReadyPickupEmail(orderId: string, opts?: { force?
   const db = createAdminClient();
   const { data: order, error } = await db.from("shop_orders").select("*").eq("id", orderId).maybeSingle();
   if (error || !order) return { sent: false };
+  if (order.fulfillment !== "pickup") return { sent: false };
   if (order.status !== "ready_pickup") return { sent: false };
   if (order.pickup_ready_email_sent_at && !opts?.force) return { sent: false };
 

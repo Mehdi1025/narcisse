@@ -4,9 +4,18 @@ import { PICKUP_LOCATION } from "@/lib/shop/config";
 import { ORDER_STATUS_HINT, ORDER_STATUS_LABEL } from "@/lib/shop/orderLabels";
 import type { PublicOrderTracking } from "@/lib/shop/getOrderByTrackingToken";
 
+function formatShipping(order: PublicOrderTracking): string | null {
+  if (order.fulfillment !== "shipping" || !order.shipping_line1) return null;
+  return [order.shipping_line1, order.shipping_line2, [order.shipping_postal_code, order.shipping_city].filter(Boolean).join(" ")]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export default function OrderTracking({ order }: { order: PublicOrderTracking }) {
   const statusLabel = ORDER_STATUS_LABEL[order.status] ?? order.status;
   const hint = ORDER_STATUS_HINT[order.status];
+  const shippingAddr = formatShipping(order);
+  const isShipping = order.fulfillment === "shipping";
 
   return (
     <div className="shop min-h-dvh bg-papier text-encre">
@@ -26,11 +35,18 @@ export default function OrderTracking({ order }: { order: PublicOrderTracking })
           <p className="app-label">Statut</p>
           <p className="mt-2 font-serif text-3xl">{statusLabel}</p>
           {hint && <p className="mt-3 text-[14px] leading-relaxed text-encre/65">{hint}</p>}
-          {order.status === "ready_pickup" && (
+          {order.status === "ready_pickup" && !isShipping && (
             <p className="mt-4 text-[13px] text-encre/55">
               {PICKUP_LOCATION.name} — {PICKUP_LOCATION.line1}
               <br />
               {PICKUP_LOCATION.postalCode} {PICKUP_LOCATION.city}
+            </p>
+          )}
+          {isShipping && shippingAddr && (
+            <p className="mt-4 text-[13px] text-encre/55">
+              <strong className="font-medium text-encre/70">Adresse de livraison</strong>
+              <br />
+              {shippingAddr}
             </p>
           )}
         </div>
@@ -51,7 +67,7 @@ export default function OrderTracking({ order }: { order: PublicOrderTracking })
         </p>
 
         <p className="mt-8 text-[12px] text-encre/45">
-          Conservez cette page pour suivre votre commande. Un e-mail de confirmation vous sera envoyé prochainement.
+          Conservez cette page pour suivre votre commande. Les mises à jour importantes vous sont aussi envoyées par e-mail.
         </p>
       </div>
     </div>

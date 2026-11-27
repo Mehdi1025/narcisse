@@ -72,6 +72,7 @@ export type ShopOrderTableRow = {
   cgv_accepted_at: string | null;
   confirmation_email_sent_at: string | null;
   pickup_ready_email_sent_at: string | null;
+  shipped_email_sent_at: string | null;
   created_at: string;
   updated_at: string;
 };

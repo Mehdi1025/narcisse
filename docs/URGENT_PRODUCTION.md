@@ -13,6 +13,7 @@ Exécuter dans le SQL Editor, **dans l’ordre** :
 7. `025_shop_cancel_restore_email.sql`
 8. `026_products_archive.sql`
 9. `027_rate_limit.sql`
+10. `028_shipping_email_tracking.sql`
 
 ### Vérifications SQL rapides
 
