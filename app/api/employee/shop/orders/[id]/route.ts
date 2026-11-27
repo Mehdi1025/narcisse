@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireShopWorker } from "@/lib/auth/requireShopWorker";
+import { maybeSendReadyPickupOnTransition } from "@/lib/email/sendOrderReadyPickup";
 import type { ShopOrderStatus } from "@/lib/shop/types";
 
 const WORKER_STATUSES: ShopOrderStatus[] = ["preparing", "ready_pickup", "delivered"];
@@ -28,6 +29,9 @@ export async function PATCH(request: Request, ctx: Ctx) {
     return NextResponse.json({ error: "Confirmez le nom de la cliente" }, { status: 400 });
   }
 
+  const { data: before } = await auth.supabase.from("shop_orders").select("status").eq("id", id).single();
+  const prev = before?.status;
+
   const { data, error } = await auth.supabase.rpc("employee_transition_shop_order", {
     p_order_id: id,
     p_status: status,
@@ -38,6 +42,10 @@ export async function PATCH(request: Request, ctx: Ctx) {
 
   const { data: lines } = await auth.supabase.from("shop_order_lines").select("*").eq("order_id", id);
   const order = Array.isArray(data) ? data[0] : data;
+
+  if (status === "ready_pickup") {
+    await maybeSendReadyPickupOnTransition(id, prev, status);
+  }
 
   return NextResponse.json({ order: { ...order, shop_order_lines: lines ?? [] } });
 }
