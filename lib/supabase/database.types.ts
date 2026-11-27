@@ -296,7 +296,12 @@ export type Database = {
         Returns: ShopOrderTableRow[];
       };
       employee_transition_shop_order: {
-        Args: { p_order_id: string; p_status: ShopOrderStatus; p_confirm_name?: string | null };
+        Args: {
+          p_order_id: string;
+          p_status: ShopOrderStatus;
+          p_confirm_name?: string | null;
+          p_admin_note?: string | null;
+        };
         Returns: ShopOrderTableRow;
       };
       employee_pickup_by_order_number: {

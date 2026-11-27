@@ -41,7 +41,8 @@ Employée : préparer → **prête au retrait** → comptoir. E-mail automatique
 
 1. Activer `NEXT_PUBLIC_SHOP_SHIPPING_ENABLED=1` (Vercel + redeploy).
 2. Client choisit livraison + adresse au checkout.
-3. Admin commandes : **Préparer** → **Marquer expédiée** (e-mail « expédiée ») → **Marquer livrée**.
+3. **Employée** (`/dashboard#worker/shop` → onglet **Livraison**) : **Marquer expédiée** (e-mail + note transport) → **Marquer livrée** — même base que l’admin (liste rafraîchie toutes les 20 s).
+4. L’**admin** peut faire les mêmes actions en parallèle.
 
 Migration : `028_shipping_email_tracking.sql` (`shipped_email_sent_at`, adresse sur page suivi).
 

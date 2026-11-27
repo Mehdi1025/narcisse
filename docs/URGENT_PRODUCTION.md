@@ -14,6 +14,7 @@ Exécuter dans le SQL Editor, **dans l’ordre** :
 8. `026_products_archive.sql`
 9. `027_rate_limit.sql`
 10. `028_shipping_email_tracking.sql`
+11. `029_worker_shipping_orders.sql` — livraisons sur le dashboard employée
 
 ### Vérifications SQL rapides
 
