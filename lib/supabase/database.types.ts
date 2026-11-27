@@ -66,6 +66,7 @@ export type ShopOrderTableRow = {
   tracking_token: string;
   paid_at: string | null;
   admin_note: string | null;
+  stock_issue: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -155,9 +156,10 @@ export type Database = {
       };
       shop_orders: {
         Row: ShopOrderTableRow;
-        Insert: Omit<ShopOrderTableRow, "id" | "created_at" | "updated_at" | "paid_at" | "stripe_checkout_session_id" | "admin_note"> & {
+        Insert: Omit<ShopOrderTableRow, "id" | "created_at" | "updated_at" | "paid_at" | "stripe_checkout_session_id" | "admin_note" | "stock_issue"> & {
           id?: string;
           tracking_token?: string;
+          stock_issue?: boolean;
           created_at?: string;
           updated_at?: string;
           paid_at?: string | null;
@@ -171,6 +173,30 @@ export type Database = {
         Row: ShopOrderLineTableRow;
         Insert: Omit<ShopOrderLineTableRow, "id"> & { id?: string };
         Update: Partial<Database["public"]["Tables"]["shop_order_lines"]["Insert"]>;
+        Relationships: [];
+      };
+      shop_settings: {
+        Row: { key: string; value: unknown; updated_at: string };
+        Insert: { key: string; value: unknown; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["shop_settings"]["Insert"]>;
+        Relationships: [];
+      };
+      stock_movements: {
+        Row: {
+          id: string;
+          product_id: string;
+          delta: number;
+          reason: string;
+          order_id: string | null;
+          note: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["stock_movements"]["Row"], "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["stock_movements"]["Insert"]>;
         Relationships: [];
       };
       profiles: {
@@ -252,6 +278,10 @@ export type Database = {
       employee_pickup_by_order_number: {
         Args: { p_order_number: string; p_confirm_name: string };
         Returns: ShopOrderTableRow;
+      };
+      set_product_stock: {
+        Args: { p_product_id: string; p_target: number; p_note?: string | null };
+        Returns: void;
       };
     };
     Enums: Record<string, never>;

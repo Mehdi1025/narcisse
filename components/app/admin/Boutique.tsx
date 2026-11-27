@@ -8,7 +8,10 @@ import { UNIVERSE_LABEL } from "@/lib/boutique/labels";
 import type { ProductRow } from "@/lib/boutique/types";
 import { COLLECTION_PATH } from "@/lib/boutique/labels";
 import { useToast } from "@/lib/app/store";
+import { ProductStockAdjust, ProductStockHistory } from "./ProductStockAdjust";
 import { Button, Card, Empty, Field, Modal, cx } from "../ui";
+
+const DEMO_IMPORT = process.env.NEXT_PUBLIC_DEMO_TOOLS === "1";
 
 const UNIVERSES = boutique.universes.map((u) => u.key);
 
@@ -76,6 +79,8 @@ export default function AdminBoutique() {
   const [form, setForm] = useState<FormState>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [stockProduct, setStockProduct] = useState<ProductRow | null>(null);
+  const [historyProductId, setHistoryProductId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -134,9 +139,11 @@ export default function AdminBoutique() {
       featured: form.featured,
       published: form.published,
       sort_order: Number(form.sort_order) || 0,
-      stock_on_hand: Math.max(0, Math.round(Number(form.stock_on_hand) || 0)),
       stock_alert_threshold: Math.max(0, Math.round(Number(form.stock_alert_threshold) || 3)),
     };
+    if (modal === "create" || !modal) {
+      Object.assign(body, { stock_on_hand: Math.max(0, Math.round(Number(form.stock_on_hand) || 0)) });
+    }
 
     setSaving(true);
     try {
@@ -187,13 +194,13 @@ export default function AdminBoutique() {
   };
 
   const importProvisoire = async () => {
-    if (!window.confirm("Importer ou mettre à jour les 16 produits de la sélection provisoire ?")) return;
+    if (!window.confirm("Ajouter les produits manquants de la sélection provisoire (stock à 0) ?")) return;
     setImporting(true);
     try {
       const res = await fetch("/api/admin/products/import-provisoire", { method: "POST", credentials: "same-origin" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Import impossible");
-      toast(`${json.count ?? 16} produits synchronisés.`);
+      toast(`${json.ajoutes ?? 0} ajouté(s), ${json.ignores ?? 0} déjà présent(s).`);
       await load();
     } catch (e) {
       toast(e instanceof Error ? e.message : "Erreur");
@@ -235,9 +242,11 @@ export default function AdminBoutique() {
           <Button size="sm" variant="ghost" onClick={openCreate}>
             Ajouter un produit
           </Button>
-          <Button size="sm" variant="soft" onClick={importProvisoire} disabled={importing}>
-            {importing ? "Import…" : "Importer la sélection provisoire (16)"}
-          </Button>
+          {DEMO_IMPORT && (
+            <Button size="sm" variant="soft" onClick={importProvisoire} disabled={importing}>
+              {importing ? "Import…" : "Importer la sélection provisoire (16)"}
+            </Button>
+          )}
           <a href={COLLECTION_PATH} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-full border border-encre/15 px-4 text-[13px] hover:bg-encre/[0.04]">
             Voir la collection
           </a>
@@ -361,10 +370,22 @@ export default function AdminBoutique() {
                 <img src={form.image_url} alt="Aperçu" className="h-full w-full object-cover" />
               </div>
             )}
+            {modal !== "create" && modal && (
+              <ReadOnlyStockBlock
+                product={modal}
+                onAdjust={() => {
+                  setStockProduct(modal);
+                  setModal(null);
+                }}
+                onHistory={() => setHistoryProductId(modal.id)}
+              />
+            )}
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field label="Stock (site + comptoir)" hint="Unités en rayon.">
-                <input className="app-input" type="number" min={0} value={form.stock_on_hand} onChange={(e) => patchField("stock_on_hand", e.target.value)} />
-              </Field>
+              {modal === "create" && (
+                <Field label="Stock initial" hint="Sera tracé comme inventaire.">
+                  <input className="app-input" type="number" min={0} value={form.stock_on_hand} onChange={(e) => patchField("stock_on_hand", e.target.value)} />
+                </Field>
+              )}
               <Field label="Seuil d'alerte" hint="Défaut 3 (H-10).">
                 <input className="app-input" type="number" min={0} value={form.stock_alert_threshold} onChange={(e) => patchField("stock_alert_threshold", e.target.value)} />
               </Field>
@@ -393,6 +414,47 @@ export default function AdminBoutique() {
           </div>
         </Modal>
       )}
+
+      {stockProduct && (
+        <ProductStockAdjust
+          product={stockProduct}
+          open
+          onClose={() => setStockProduct(null)}
+          onUpdated={load}
+        />
+      )}
+      {historyProductId && (
+        <ProductStockHistory open productId={historyProductId} onClose={() => setHistoryProductId(null)} />
+      )}
+    </div>
+  );
+}
+
+function ReadOnlyStockBlock({
+  product,
+  onAdjust,
+  onHistory,
+}: {
+  product: ProductRow;
+  onAdjust: () => void;
+  onHistory: () => void;
+}) {
+  const onHand = product.stock_on_hand ?? 0;
+  const reserved = product.stock_reserved ?? 0;
+  const available = Math.max(0, onHand - reserved);
+  return (
+    <div className="rounded-xl border border-encre/10 bg-encre/[0.03] p-4 text-[13px]">
+      <p>
+        Physique <strong>{onHand}</strong> · Réservé <strong>{reserved}</strong> · Disponible <strong>{available}</strong>
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" variant="soft" type="button" onClick={onAdjust}>
+          Ajuster le stock
+        </Button>
+        <Button size="sm" variant="ghost" type="button" onClick={onHistory}>
+          Historique
+        </Button>
+      </div>
     </div>
   );
 }

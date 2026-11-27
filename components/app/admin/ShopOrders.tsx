@@ -30,6 +30,8 @@ type Order = {
   total_cents: number;
   created_at: string;
   tracking_token?: string;
+  stock_issue?: boolean;
+  admin_note?: string | null;
   shop_order_lines: OrderLine[];
 };
 
@@ -38,6 +40,7 @@ export default function ShopOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<Order | null>(null);
+  const [stockOnly, setStockOnly] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -87,22 +90,47 @@ export default function ShopOrders() {
     return null;
   };
 
+  const shown = stockOnly ? orders.filter((o) => o.stock_issue) : orders;
+
   return (
   <>
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setStockOnly(false)}
+          className={cx("h-9 rounded-full px-4 text-[13px]", !stockOnly ? "bg-encre text-ivoire" : "bg-encre/[0.06]")}
+        >
+          Toutes
+        </button>
+        <button
+          type="button"
+          onClick={() => setStockOnly(true)}
+          className={cx("h-9 rounded-full px-4 text-[13px]", stockOnly ? "bg-bordeaux text-papier" : "bg-encre/[0.06]")}
+        >
+          Stock à vérifier ({orders.filter((o) => o.stock_issue).length})
+        </button>
+      </div>
       <Card className="!p-0 overflow-hidden">
         {loading ? (
           <p className="p-6 text-[13px] text-encre/50">Chargement des commandes…</p>
-        ) : orders.length === 0 ? (
+        ) : shown.length === 0 ? (
           <div className="p-6">
             <Empty>Aucune commande pour le moment.</Empty>
           </div>
         ) : (
           <ul className="divide-y divide-encre/[0.06]">
-            {orders.map((o) => (
+            {shown.map((o) => (
               <li key={o.id}>
                 <button type="button" onClick={() => setDetail(o)} className="flex w-full flex-wrap items-center justify-between gap-4 p-5 text-left hover:bg-encre/[0.02]">
                   <div>
-                    <p className="font-medium">{o.order_number}</p>
+                    <p className="font-medium">
+                      {o.order_number}
+                      {o.stock_issue && (
+                        <span className="ml-2 rounded-full bg-bordeaux/15 px-2 py-0.5 text-[10px] font-medium text-bordeaux">
+                          Stock à vérifier
+                        </span>
+                      )}
+                    </p>
                     <p className="mt-1 text-[12.5px] text-encre/55">
                       {o.customer_name} · {o.fulfillment === "shipping" ? "Livraison" : "Retrait"} · {formatPrice(o.total_cents)}
                     </p>
