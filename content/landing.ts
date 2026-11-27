@@ -152,9 +152,9 @@ export const footer = {
   ],
   contact: ["Adresse : à renseigner.", "E-mail : à renseigner.", "Réseaux sociaux : à renseigner."],
   legal: [
-    { label: "CGV boutique", href: "/boutique/cgv" },
     { label: "Mentions légales", href: "/mentions-legales" },
-    { label: "Politique de confidentialité", href: "/confidentialite" },
+    { label: "Confidentialité", href: "/confidentialite" },
+    { label: "CGV", href: "/cgv" },
   ],
   note: "Les accompagnements de bien-être ne remplacent pas un suivi médical ou psychologique lorsque celui-ci est nécessaire.",
 };

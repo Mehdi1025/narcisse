@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { legalLinks, shopLegalFacts } from "@/content/legal";
+import { BOUTIQUE_UNIVERS, LEGAL, legalLinks } from "@/content/legal";
 
 /** Bandeau informationnel boutique (prix TTC, CGV accessibles). */
 export default function ShopLegalStrip() {
@@ -9,8 +9,8 @@ export default function ShopLegalStrip() {
       aria-label="Informations légales boutique"
     >
       <p>
-        Prix affichés en euros, toutes taxes comprises. {shopLegalFacts.productNature}.{" "}
-        {shopLegalFacts.pickupOnlyAtLaunch ? "Retrait sur place au lancement — sans frais." : ""}
+        Prix affichés en euros, toutes taxes comprises. Produits physiques — {BOUTIQUE_UNIVERS.join(", ")}. Retrait sur place
+        — sans frais ({LEGAL.conservationRetraitJours} jours de conservation après e-mail « commande prête »).
       </p>
       <p className="mt-2">
         <Link href={legalLinks.cgv} className="link-line text-bordeaux">

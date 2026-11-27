@@ -1,11 +1,11 @@
-import { legalOperator } from "@/content/legal";
-import { completer } from "@/lib/legal/completer";
+import { LEGAL } from "@/content/legal";
+import { legalField } from "@/lib/legal/display";
 import { shippingEnabled } from "@/lib/shop/defaults";
 
 /** Adresse de retrait affichée au checkout (alignée sur les données légales). */
 export const PICKUP_LOCATION = {
-  name: legalOperator.brandName,
-  line1: completer(legalOperator.registeredAddress),
+  name: LEGAL.nomCommercial,
+  line1: legalField(LEGAL.lieu.adresseRetrait),
   line2: "Retrait sur place après e-mail « commande prête »",
   city: "",
   postalCode: "",
