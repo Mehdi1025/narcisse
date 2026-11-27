@@ -13,6 +13,8 @@ import { canAddProduct, useCart } from "./cart";
 import ShopHero from "./ShopHero";
 import ShopGrid from "./ShopGrid";
 import { GiftSpotlight, UniverseIndex } from "./ShopIndex";
+import ShopLegalStrip from "./ShopLegalStrip";
+import { legalLinks } from "@/content/legal";
 
 /** Catalogue + panier : fournis par `app/boutique/layout.tsx` (un seul provider). */
 export default function BoutiquePage() {
@@ -35,6 +37,7 @@ function Shop() {
         <ShopGrid filter={filter} setFilter={setFilter} open={setProduct} />
         <UniverseIndex pick={pick} />
         <GiftSpotlight open={setProduct} />
+        <ShopLegalStrip />
       </main>
       <Footer base="/" />
       <ProductPanel product={product} close={() => setProduct(null)} />
@@ -175,6 +178,7 @@ function ProductPanel({ product, close }: { product: Product | null; close: () =
             <p data-in className="mt-6 font-serif text-[30px]">
               {p.priceFrom && <span className="mr-2 text-[16px] text-gris/60">dès</span>}
               {euro(p.price)}
+              <span className="ml-2 text-[14px] font-sans text-gris/55">TTC</span>
             </p>
             <p data-in className="mt-8 text-[16px] leading-relaxed text-gris">{p.description}</p>
             <div data-in className="mt-10 flex items-center gap-4">
@@ -208,6 +212,14 @@ function ProductPanel({ product, close }: { product: Product | null; close: () =
             <dl data-in className="mt-auto grid gap-3 border-t border-encre/10 pt-8 text-[13px] text-gris/75">
               <div className="flex justify-between gap-4"><dt>Référence</dt><dd>{p.ref}</dd></div>
               <div className="flex justify-between gap-4"><dt>Paiement</dt><dd>{shop.checkoutNote}</dd></div>
+              <div className="flex justify-between gap-4">
+                <dt>Informations</dt>
+                <dd className="text-right">
+                  <Link href={legalLinks.cgv} className="link-line text-bordeaux">
+                    CGV
+                  </Link>
+                </dd>
+              </div>
               <p className="text-[12px] text-gris/55">{shop.imageNote}</p>
             </dl>
           </div>

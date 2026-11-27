@@ -152,6 +152,7 @@ export const footer = {
   ],
   contact: ["Adresse : à renseigner.", "E-mail : à renseigner.", "Réseaux sociaux : à renseigner."],
   legal: [
+    { label: "CGV boutique", href: "/boutique/cgv" },
     { label: "Mentions légales", href: "/mentions-legales" },
     { label: "Politique de confidentialité", href: "/confidentialite" },
   ],
