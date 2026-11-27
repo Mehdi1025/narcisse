@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateWorkshops } from "@/lib/cache/revalidatePublic";
 import { createClient } from "@/lib/supabase/server";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -34,5 +35,6 @@ export async function POST(request: Request, ctx: Ctx) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
+  revalidateWorkshops();
   return NextResponse.json({ result: data });
 }

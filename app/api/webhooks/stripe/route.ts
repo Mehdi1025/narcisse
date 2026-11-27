@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateShop } from "@/lib/cache/revalidatePublic";
 import { getStripe } from "@/lib/stripe/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type Stripe from "stripe";
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
         console.error("complete_shop_order_payment", error.message);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
+      revalidateShop();
     }
   }
 

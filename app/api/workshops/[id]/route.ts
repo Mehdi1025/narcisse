@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { requireEmployee } from "@/lib/auth/requireEmployee";
+import { revalidateWorkshops } from "@/lib/cache/revalidatePublic";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -38,6 +39,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
     if (body.status === "cancelled") patch.status = "cancelled";
     const { data, error } = await admin.supabase.from("workshops").update(patch).eq("id", id).select("*").single();
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    revalidateWorkshops();
     return NextResponse.json({ workshop: data });
   }
 

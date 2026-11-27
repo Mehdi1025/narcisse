@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { revalidateShop } from "@/lib/cache/revalidatePublic";
 import { STOCK_ADJUST_MOTIFS } from "@/lib/shop/stockLabels";
 
 const adjustSchema = z.discriminatedUnion("mode", [
@@ -75,6 +76,7 @@ export async function POST(request: Request, ctx: Ctx) {
   }
 
   const { data: product, error: loadErr } = await auth.supabase.from("products").select("*").eq("id", id).single();
+  revalidateShop();
   if (loadErr) return NextResponse.json({ ok: true });
   return NextResponse.json({ product });
 }

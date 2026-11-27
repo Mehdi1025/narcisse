@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { revalidateWorkshops } from "@/lib/cache/revalidatePublic";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -27,7 +28,10 @@ export async function POST(request: Request, ctx: Ctx) {
 
     if (!error && data) {
       const workshop = Array.isArray(data) ? data[0] : data;
-      if (workshop) return NextResponse.json({ workshop });
+      if (workshop) {
+        revalidateWorkshops();
+        return NextResponse.json({ workshop });
+      }
     }
 
     const { data: fallback, error: fbError } = await auth.supabase
@@ -46,6 +50,7 @@ export async function POST(request: Request, ctx: Ctx) {
       const msg = error?.message ?? fbError?.message ?? "Publication impossible — exécutez la migration 012 dans Supabase.";
       return NextResponse.json({ error: msg }, { status: 400 });
     }
+    revalidateWorkshops();
     return NextResponse.json({ workshop: fallback });
   }
 

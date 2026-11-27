@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { revalidateShop } from "@/lib/cache/revalidatePublic";
 import { slugify } from "@/lib/boutique/format";
 import type { ProductInput, ProductUniverse } from "@/lib/boutique/types";
 
@@ -101,7 +102,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: stockErr.message }, { status: 400 });
     }
     const { data: refreshed } = await auth.supabase.from("products").select("*").eq("id", data.id).single();
+    revalidateShop();
     return NextResponse.json({ product: refreshed ?? data }, { status: 201 });
   }
+  revalidateShop();
   return NextResponse.json({ product: data }, { status: 201 });
 }

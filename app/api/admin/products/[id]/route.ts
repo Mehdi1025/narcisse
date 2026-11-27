@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { revalidateShop } from "@/lib/cache/revalidatePublic";
 import { slugify } from "@/lib/boutique/format";
 import type { ProductInput, ProductUniverse } from "@/lib/boutique/types";
 
@@ -75,6 +76,7 @@ export async function PATCH(request: Request, ctx: Ctx) {
   const { data, error } = await auth.supabase.from("products").update(patch).eq("id", id).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   if (!data) return NextResponse.json({ error: "Produit introuvable" }, { status: 404 });
+  revalidateShop();
   return NextResponse.json({ product: data });
 }
 
@@ -85,5 +87,6 @@ export async function DELETE(_request: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const { error } = await auth.supabase.from("products").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateShop();
   return NextResponse.json({ ok: true });
 }

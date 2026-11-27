@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { revalidateShop } from "@/lib/cache/revalidatePublic";
 import { catalogueProvisoireRows } from "@/lib/boutique/catalogueProvisoire";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -31,5 +32,6 @@ export async function POST() {
   const { error } = await db.from("products").insert(rows);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
+  revalidateShop();
   return NextResponse.json({ ajoutes: rows.length, ignores: have.size });
 }
