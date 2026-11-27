@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { checkoutBlockedForLive } from "@/lib/legal/stripeMode";
 import { siteOrigin } from "@/lib/shop/config";
 import { createPendingShopOrder } from "@/lib/shop/createOrder";
 import { getReservationMinutes } from "@/lib/shop/getReservationMinutes";
@@ -26,6 +27,10 @@ export async function POST(request: Request) {
 
   const parsed = parseCheckoutBody(json);
   if ("error" in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 });
+
+  if (checkoutBlockedForLive()) {
+    return NextResponse.json({ error: "Les commandes en ligne ouvrent très prochainement." }, { status: 503 });
+  }
 
   const stripe = getStripe();
   if (!stripe) {

@@ -1,4 +1,5 @@
 import "server-only";
+import { LEGAL } from "@/content/legal";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { ShopOrderTableRow } from "@/lib/supabase/database.types";
 import type { CheckoutInput } from "@/lib/shop/types";
@@ -87,6 +88,8 @@ export async function createPendingShopOrder(
       shipping_cost_cents,
       subtotal_cents,
       total_cents,
+      cgv_version: LEGAL.version,
+      cgv_accepted_at: new Date().toISOString(),
     })
     .select("*")
     .single();

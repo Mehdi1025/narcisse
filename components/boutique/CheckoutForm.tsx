@@ -3,14 +3,21 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { euro, shop } from "@/content/boutique";
-import { legalLinks, legalOperator, shopLegalFacts } from "@/content/legal";
-import { completer } from "@/lib/legal/completer";
+import { LEGAL, legalLinks } from "@/content/legal";
+import { legalField } from "@/lib/legal/display";
 import { PICKUP_LOCATION, shippingEnabled, shippingFlatCents } from "@/lib/shop/config";
 import { useCart } from "./cart";
 
 const shippingEuro = shippingFlatCents() / 100;
+const LIVE_BLOCK_MSG = "Les commandes en ligne ouvrent très prochainement.";
 
-export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
+export default function CheckoutForm({
+  cancelled,
+  checkoutBlockedLive = false,
+}: {
+  cancelled?: boolean;
+  checkoutBlockedLive?: boolean;
+}) {
   const { lines, total, canCheckout } = useCart();
   const shippingOn = shippingEnabled();
   const [fulfillment, setFulfillment] = useState<"pickup" | "shipping">("pickup");
@@ -23,9 +30,10 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
   const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [acceptLegal, setAcceptLegal] = useState(false);
+  const [acceptCgv, setAcceptCgv] = useState(false);
 
   const grandTotal = useMemo(() => total + (fulfillment === "shipping" ? shippingEuro : 0), [total, fulfillment]);
+  const cgvErrorId = "checkout-cgv-error";
 
   if (!lines.length) {
     return (
@@ -39,12 +47,16 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
   }
 
   const pay = async () => {
+    if (checkoutBlockedLive) {
+      setError(LIVE_BLOCK_MSG);
+      return;
+    }
     if (!canCheckout) {
       setError("Le catalogue en ligne n’est pas encore synchronisé. Réessayez plus tard ou contactez le salon.");
       return;
     }
-    if (!acceptLegal) {
-      setError("Veuillez accepter les CGV et la politique de confidentialité.");
+    if (!acceptCgv) {
+      setError("Veuillez accepter les conditions générales de vente.");
       return;
     }
     setLoading(true);
@@ -61,7 +73,7 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
               ? { line1, line2, postalCode, city, country: "FR" }
               : undefined,
           lines: lines.map((l) => ({ productId: l.product.id, quantity: l.qty })),
-          acceptLegal: true,
+          acceptCgv: true,
         }),
       });
       const json = await res.json();
@@ -80,6 +92,17 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
         <Link href="/boutique" className="text-[13px] tracking-wide uppercase text-encre/60 hover:text-bordeaux">
           ← Boutique
         </Link>
+        <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-encre/55">
+          <Link href={legalLinks.mentions} className="link-line">
+            Mentions légales
+          </Link>
+          <Link href={legalLinks.privacy} className="link-line">
+            Confidentialité
+          </Link>
+          <Link href={legalLinks.cgv} className="link-line text-bordeaux">
+            CGV
+          </Link>
+        </p>
       </header>
       <div className="mx-auto grid max-w-[1100px] gap-12 px-6 py-12 md:grid-cols-[1fr_380px] md:px-12">
         <div>
@@ -97,8 +120,7 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
               <span>
                 <strong className="block text-[15px]">Retrait au salon</strong>
                 <span className="text-[13px] text-encre/55">
-                  {PICKUP_LOCATION.line1} — {shopLegalFacts.pickupFee.toLowerCase()}, e-mail quand c&apos;est prêt (conservation{" "}
-                  {shopLegalFacts.pickupRetentionDays} jours)
+                  Retrait sur place, sans frais — e-mail lorsque la commande est prête.
                 </span>
               </span>
             </label>
@@ -138,17 +160,32 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
               </li>
             ))}
           </ul>
-          {fulfillment === "shipping" && (
-            <p className="mt-2 flex justify-between text-[14px] text-encre/70">
-              <span>Livraison</span>
-              <span>{euro(shippingEuro)}</span>
-            </p>
-          )}
           <p className="mt-4 flex justify-between border-t border-encre/10 pt-4 font-serif text-2xl">
             <span>Total TTC</span>
             <span>{euro(grandTotal)}</span>
           </p>
-          <p className="mt-1 text-[12px] text-encre/50">Montants en euros, toutes taxes comprises.</p>
+          <p className="mt-1 text-[12px] text-encre/50">Retrait sur place, sans frais.</p>
+          <Link href={legalLinks.cgv} className="link-line mt-2 inline-block text-[12px] text-bordeaux" target="_blank" rel="noopener noreferrer">
+            Voir le détail dans les CGV
+          </Link>
+          <div className="mt-5 space-y-2 rounded-xl border border-encre/10 bg-papier/60 p-4 text-[12px] leading-relaxed text-encre/70">
+            <p>
+              <strong>Retrait :</strong> {PICKUP_LOCATION.line1}
+            </p>
+            <p>
+              <strong>Horaires :</strong> {legalField(LEGAL.lieu.horairesRetrait)}
+            </p>
+            <p>
+              <strong>Préparation :</strong> {legalField(LEGAL.lieu.delaiPreparation)}
+            </p>
+            <p>
+              Droit de rétractation de 14 jours, sauf produits descellés pour raisons d&apos;hygiène (voir{" "}
+              <Link href={legalLinks.cgv} className="link-line text-bordeaux" target="_blank" rel="noopener noreferrer">
+                CGV
+              </Link>
+              ).
+            </p>
+          </div>
           {!canCheckout && (
             <p className="mt-4 text-[13px] text-bordeaux">Importez le catalogue dans Supabase et renseignez les stocks pour commander en ligne.</p>
           )}
@@ -156,34 +193,42 @@ export default function CheckoutForm({ cancelled }: { cancelled?: boolean }) {
             <input
               type="checkbox"
               className="mt-1 shrink-0"
-              checked={acceptLegal}
-              onChange={(e) => setAcceptLegal(e.target.checked)}
+              checked={acceptCgv}
+              onChange={(e) => setAcceptCgv(e.target.checked)}
+              aria-describedby={error && !acceptCgv ? cgvErrorId : undefined}
             />
             <span>
               J&apos;ai lu et j&apos;accepte les{" "}
               <Link href={legalLinks.cgv} className="link-line text-bordeaux" target="_blank" rel="noopener noreferrer">
                 conditions générales de vente
-              </Link>{" "}
-              et la{" "}
-              <Link href={legalLinks.privacy} className="link-line text-bordeaux" target="_blank" rel="noopener noreferrer">
-                politique de confidentialité
               </Link>
-              . Commande sans création de compte.
+              .
             </span>
           </label>
           <p className="mt-3 text-[12px] text-encre/50">
-            Droit de rétractation de {shopLegalFacts.withdrawalDays} jours (sauf exceptions légales, notamment produits d&apos;hygiène
-            descellés). Contact : {completer(legalOperator.contactEmail)}.
+            Vos données sont utilisées pour traiter votre commande.{" "}
+            <Link href={legalLinks.privacy} className="link-line text-bordeaux">
+              En savoir plus
+            </Link>
+            . Achat sans création de compte — suivi par lien personnel.
           </p>
-          {error && <p className="mt-4 text-[13px] text-bordeaux">{error}</p>}
-          <button
-            type="button"
-            disabled={loading || !name.trim() || !email.trim() || !canCheckout || !acceptLegal}
-            onClick={pay}
-            className="btn btn-fill mt-6 w-full disabled:opacity-50"
-          >
-            <span className="btn-label">{loading ? "Redirection…" : "Payer en ligne"}</span>
-          </button>
+          {error && (
+            <p id={cgvErrorId} className="mt-4 text-[13px] text-bordeaux" role="alert">
+              {error}
+            </p>
+          )}
+          {checkoutBlockedLive ? (
+            <p className="mt-6 rounded-xl border border-amber-600/30 bg-amber-50 px-4 py-3 text-[13px] text-amber-950">{LIVE_BLOCK_MSG}</p>
+          ) : (
+            <button
+              type="button"
+              disabled={loading || !name.trim() || !email.trim() || !canCheckout || !acceptCgv}
+              onClick={pay}
+              className="btn btn-fill mt-6 w-full disabled:opacity-50"
+            >
+              <span className="btn-label">{loading ? "Redirection…" : "Commander avec obligation de paiement"}</span>
+            </button>
+          )}
           <p className="mt-4 text-center text-[12px] text-encre/50">{shop.checkoutNote}</p>
         </aside>
       </div>

@@ -67,6 +67,9 @@ export type ShopOrderTableRow = {
   paid_at: string | null;
   admin_note: string | null;
   stock_issue: boolean;
+  cgv_version: string | null;
+  cgv_accepted_at: string | null;
+  confirmation_email_sent_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -156,10 +159,25 @@ export type Database = {
       };
       shop_orders: {
         Row: ShopOrderTableRow;
-        Insert: Omit<ShopOrderTableRow, "id" | "created_at" | "updated_at" | "paid_at" | "stripe_checkout_session_id" | "admin_note" | "stock_issue"> & {
+        Insert: Omit<
+          ShopOrderTableRow,
+          | "id"
+          | "created_at"
+          | "updated_at"
+          | "paid_at"
+          | "stripe_checkout_session_id"
+          | "admin_note"
+          | "stock_issue"
+          | "cgv_version"
+          | "cgv_accepted_at"
+          | "confirmation_email_sent_at"
+        > & {
           id?: string;
           tracking_token?: string;
           stock_issue?: boolean;
+          cgv_version?: string | null;
+          cgv_accepted_at?: string | null;
+          confirmation_email_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
           paid_at?: string | null;
