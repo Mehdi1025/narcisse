@@ -39,11 +39,6 @@ function parsePatch(body: unknown): Partial<ProductInput> | null {
     if (!Number.isFinite(n)) return null;
     patch.sort_order = n;
   }
-  if ("stock_on_hand" in o) {
-    const n = typeof o.stock_on_hand === "number" ? o.stock_on_hand : Number(o.stock_on_hand);
-    if (!Number.isFinite(n) || n < 0) return null;
-    patch.stock_on_hand = Math.round(n);
-  }
   if ("stock_alert_threshold" in o) {
     const n = typeof o.stock_alert_threshold === "number" ? o.stock_alert_threshold : Number(o.stock_alert_threshold);
     if (!Number.isFinite(n) || n < 0) return null;
@@ -65,6 +60,11 @@ export async function PATCH(request: Request, ctx: Ctx) {
     json = await request.json();
   } catch {
     return NextResponse.json({ error: "Corps invalide" }, { status: 400 });
+  }
+
+  const raw = json as Record<string, unknown>;
+  if ("stock_on_hand" in raw) {
+    return NextResponse.json({ error: "Le stock se modifie par un ajustement tracé" }, { status: 400 });
   }
 
   const patch = parsePatch(json);

@@ -66,16 +66,42 @@ export async function POST(request: Request) {
   const input = parseBody(json);
   if (!input) return NextResponse.json({ error: "Données produit invalides" }, { status: 400 });
 
-  const insert = {
-    ...input,
-    slug: input.slug ?? slugify(input.name),
-    description: input.description ?? "",
-  };
+  const initialStock = Math.max(0, input.stock_on_hand ?? 0);
 
-  const { data, error } = await auth.supabase.from("products").insert(insert).select("*").single();
+  const { data, error } = await auth.supabase
+    .from("products")
+    .insert({
+      name: input.name,
+      slug: input.slug ?? slugify(input.name),
+      tagline: input.tagline,
+      description: input.description ?? "",
+      universe: input.universe,
+      price_cents: input.price_cents,
+      image_url: input.image_url,
+      featured: input.featured,
+      published: input.published,
+      sort_order: input.sort_order,
+      stock_alert_threshold: input.stock_alert_threshold,
+    })
+    .select("*")
+    .single();
   if (error) {
     const msg = error.code === "23505" ? "Ce slug existe déjà — modifiez le nom." : error.message;
     return NextResponse.json({ error: msg }, { status: 400 });
+  }
+  if (initialStock > 0) {
+    const { error: stockErr } = await auth.supabase.rpc("adjust_product_stock", {
+      p_product_id: data.id,
+      p_delta: initialStock,
+      p_reason: "inventaire",
+      p_note: "Stock initial",
+    });
+    if (stockErr) {
+      await auth.supabase.from("products").delete().eq("id", data.id);
+      return NextResponse.json({ error: stockErr.message }, { status: 400 });
+    }
+    const { data: refreshed } = await auth.supabase.from("products").select("*").eq("id", data.id).single();
+    return NextResponse.json({ product: refreshed ?? data }, { status: 201 });
   }
   return NextResponse.json({ product: data }, { status: 201 });
 }
