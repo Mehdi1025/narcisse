@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { legalLinks } from "@/content/legal";
 import type { PublishedWorkshop } from "@/lib/workshops/types";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
@@ -90,6 +91,13 @@ export default function AteliersPublic({ workshops }: { workshops: PublishedWork
                 <input className="app-input" placeholder="Nom et prénom" value={form.full_name} onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))} />
                 <input className="app-input" type="email" placeholder="E-mail" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
                 <input className="app-input" placeholder="Téléphone (optionnel)" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+                <p className="text-[12px] leading-relaxed text-gris/65">
+                  Vos données servent uniquement à gérer votre inscription.{" "}
+                  <Link href={legalLinks.privacy} className="link-line text-bordeaux">
+                    En savoir plus
+                  </Link>
+                  . Merci de ne pas indiquer d&apos;information de santé.
+                </p>
                 <button type="button" className="btn btn-fill w-full" disabled={pending} onClick={register}>
                   <span className="btn-label">{pending ? "Envoi…" : "Confirmer"}</span>
                 </button>
